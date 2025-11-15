@@ -1,0 +1,158 @@
+[build-system]
+requires = ["setuptools~=69.0", "wheel~=0.42.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ClaudeConfig"
+version = "0.1.0"
+license = { text = "GPL-3.0-only" }
+authors = [{ name = "Maurice Faber", email = "maurice@instrukt.ai" }]
+description = "Automated Claude Code configuration with hooks, TTS, LLM, and MCP server management"
+readme = "README.md"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.11",
+  "Typing :: Typed",
+]
+keywords = ["claude-code", "hooks", "tts", "llm", "mcp", "installer"]
+dynamic = ["optional-dependencies"]
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hooks*", "scripts*", "utils*"]
+
+[tool.black]
+line-length = 120
+preview = true
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+check_untyped_defs = true
+disable_error_code = ["import-untyped"]
+disallow_any_explicit = true  # Ban Any - must use type: ignore to allow
+disallow_any_generics = true
+disallow_untyped_defs = true
+exclude = ["^venv/", "^.venv/"]
+files = ["**/*.py"]
+follow_imports = "skip"
+python_version = "3.11"
+strict_optional = false
+warn_redundant_casts = true
+warn_return_any = true  # Warn when functions return Any
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false  # Allow untyped defs in tests only
+
+[tool.pylint.'MESSAGES CONTROL']
+# CRITICAL: import-outside-toplevel (C0415) is ENABLED and will fail the build
+# ALL imports MUST be at the top of the file
+enable = ["import-outside-toplevel"]
+fail-on = ["import-outside-toplevel"]
+disable = [
+  "missing-docstring",
+  "missing-module-docstring",
+  "duplicate-code",
+  # Code complexity - requires refactoring
+  "too-many-instance-attributes",
+  "too-many-locals",
+  "too-many-return-statements",
+  "too-many-branches",
+  "too-many-statements",
+  "too-many-arguments",
+  "too-many-positional-arguments",
+  "too-many-public-methods",
+  "too-many-lines",
+  "too-few-public-methods",
+  # Intentional patterns
+  "broad-exception-caught",  # Daemon robustness
+  "consider-using-with",  # Lock file handle must stay open
+  "attribute-defined-outside-init",  # Async init pattern
+  "protected-access",  # Internal framework use
+  "redefined-outer-name",  # Function param shadowing
+  "unused-argument",  # Handler signatures
+  "fixme",  # TODOs are tracked
+  "no-else-return",  # Early returns
+  "arguments-renamed",  # Override compatibility
+  "consider-using-f-string",  # Legacy formatting
+  "unreachable",  # Debug code
+  "ungrouped-imports",  # Import order
+  "unnecessary-ellipsis",  # Required in Protocol definitions
+  "global-statement",  # Module-level singletons
+  "too-many-nested-blocks",  # Complex async logic
+  "redefined-builtin",  # type parameter shadows builtin
+  "line-too-long",  # Documentation
+  "unspecified-encoding",  # Default UTF-8 is fine
+  "assignment-from-none",  # Optional return values
+  "unnecessary-pass",  # Empty ABC methods
+  "wrong-import-position",  # TYPE_CHECKING guards
+  "unused-variable",  # Work in progress
+]
+
+[tool.pylint.'FORMAT']
+max-line-length = 120
+
+[tool.pyproject-fmt]
+indent = 4
+keep_full_version = false
+max_supported_python = "3.13"
+
+
+[tool.setuptools.dynamic]
+optional-dependencies = { test = { file = ["requirements-test.txt"] } }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+  "-v",
+  "--strict-markers",
+  "--strict-config",
+  "--tb=short",
+]
+markers = [
+  "unit: Unit tests (fast, isolated, mocked)",
+  "integration: Integration tests (slower, real components)",
+  "timeout: Test timeout marker",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["hooks", "scripts", "utils"]
+omit = [
+  "*/tests/*",
+  "*/__pycache__/*",
+  "*/.venv/*",
+  "*/venv/*",
+]
+branch = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "coverage/html"
+
+[tool.coverage.xml]
+output = "coverage/coverage.xml"
+
+[tool.coverage.json]
+output = "coverage/coverage.json"

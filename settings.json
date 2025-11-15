@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": { },
+  "permissions": {
+    "allow": [ ],
+    "deny": [ ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/notification.py"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type Notification --summarize "
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/session_start.py"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionStart"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/session_end.py"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionEnd"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/stop.py"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type Stop --add-chat"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/subagent_stop.py"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type SubagentStop"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/user_prompt_submit.sh"
+          },
+          {
+            "type": "command",
+            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type UserPromptSubmit --summarize"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bunx -y ccstatusline@latest",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "pr-review-toolkit@claude-code-plugins": true,
+    "commit-commands@claude-code-plugins": true,
+    "feature-dev@claude-code-plugins": true,
+    "security-guidance@claude-code-plugins": true,
+    "code-review@claude-code-plugins": true
+  },
+  "alwaysThinkingEnabled": false,
+  "feedbackSurveyState": {
+    "lastShownTime": 1754048693214
+  }
+}

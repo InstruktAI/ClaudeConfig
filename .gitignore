@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*egg-info
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.venv/
+
+# IDEs
+.vscode/
+.history/
+
+# OS
+.DS_Store
+
+# Claude Code generated/runtime
+data/
+debug/
+downloads/
+file-history/
+ide/
+local/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+todos/
+history.jsonl
+version_check_cache
+
+# project specific
+id.md
+uv.lock
+plugins/marketplaces/

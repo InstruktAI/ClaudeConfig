@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "plugins": {
+    "pr-review-toolkit@claude-code-plugins": {
+      "version": "1.0.0",
+      "installedAt": "2025-11-15T15:20:44.758Z",
+      "lastUpdated": "2025-11-15T15:20:44.758Z",
+      "installPath": "/Users/Morriz/.claude/plugins/marketplaces/claude-code-plugins/plugins/pr-review-toolkit",
+      "gitCommitSha": "b42fd9928c8f80ead5ca43e4e0673da22faca6bd",
+      "isLocal": true
+    },
+    "commit-commands@claude-code-plugins": {
+      "version": "1.0.0",
+      "installedAt": "2025-11-15T15:20:44.758Z",
+      "lastUpdated": "2025-11-15T15:20:44.758Z",
+      "installPath": "/Users/Morriz/.claude/plugins/marketplaces/claude-code-plugins/plugins/commit-commands",
+      "gitCommitSha": "b42fd9928c8f80ead5ca43e4e0673da22faca6bd",
+      "isLocal": true
+    },
+    "feature-dev@claude-code-plugins": {
+      "version": "1.0.0",
+      "installedAt": "2025-11-15T15:20:44.758Z",
+      "lastUpdated": "2025-11-15T15:20:44.758Z",
+      "installPath": "/Users/Morriz/.claude/plugins/marketplaces/claude-code-plugins/plugins/feature-dev",
+      "gitCommitSha": "b42fd9928c8f80ead5ca43e4e0673da22faca6bd",
+      "isLocal": true
+    },
+    "security-guidance@claude-code-plugins": {
+      "version": "1.0.0",
+      "installedAt": "2025-11-15T15:20:44.758Z",
+      "lastUpdated": "2025-11-15T15:20:44.758Z",
+      "installPath": "/Users/Morriz/.claude/plugins/marketplaces/claude-code-plugins/plugins/security-guidance",
+      "gitCommitSha": "b42fd9928c8f80ead5ca43e4e0673da22faca6bd",
+      "isLocal": true
+    },
+    "code-review@claude-code-plugins": {
+      "version": "1.0.0",
+      "installedAt": "2025-11-15T15:20:44.758Z",
+      "lastUpdated": "2025-11-15T15:20:44.758Z",
+      "installPath": "/Users/Morriz/.claude/plugins/marketplaces/claude-code-plugins/plugins/code-review",
+      "gitCommitSha": "b42fd9928c8f80ead5ca43e4e0673da22faca6bd",
+      "isLocal": true
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": [ "-y", "firecrawl-mcp" ],
+      "env": {
+        "FIRECRAWL_API_KEY": "{FIRECRAWL_API_KEY}"
+      }
+    },
+    "limitless": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-limitless"
+      ],
+      "env": {
+        "LIMITLESS_API_KEY": "{LIMITLESS_API_KEY}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}
