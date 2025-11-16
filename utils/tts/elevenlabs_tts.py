@@ -1,19 +1,18 @@
-#!.venv/bin/python
+#!/usr/bin/env python3
 
 import os
 import sys
-from pathlib import Path
 
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
 from elevenlabs.play import play
 
 # Load .env from project root
-env_path = Path.home() / ".claude" / ".env"
+env_path = os.path.expanduser("~/.claude/.env")
 load_dotenv(env_path)
 
 # Import logging after .env is loaded
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, os.path.expanduser("~/.claude"))
 from utils.logging_helper import log
 
 

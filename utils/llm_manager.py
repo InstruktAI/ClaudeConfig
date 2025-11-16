@@ -7,7 +7,6 @@ Priority order: OpenAI > Anthropic
 import os
 import random
 import subprocess
-from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -18,12 +17,11 @@ load_dotenv()
 def prompt(text: str, hook_name: str = "llm_manager") -> Optional[str]:
     """Send prompt to LLM with fallback chain (OpenAI > Anthropic)."""
 
-    script_dir = Path(__file__).parent
-    llm_dir = script_dir / "llm"
+    llm_dir = os.path.expanduser("~/.claude/utils/llm")
 
     if os.getenv("OPENAI_API_KEY"):
         result = subprocess.run(
-            [str(llm_dir / "oai.py"), text],
+            [os.path.join(llm_dir, "oai.py"), text],
             capture_output=True,
             text=True,
             timeout=15,
@@ -34,7 +32,7 @@ def prompt(text: str, hook_name: str = "llm_manager") -> Optional[str]:
 
     if os.getenv("ANTHROPIC_API_KEY"):
         result = subprocess.run(
-            [str(llm_dir / "anth.py"), text],
+            [os.path.join(llm_dir, "anth.py"), text],
             capture_output=True,
             text=True,
             timeout=15,
@@ -48,12 +46,11 @@ def prompt(text: str, hook_name: str = "llm_manager") -> Optional[str]:
 
 def generate_completion_message(hook_name: str = "llm_manager") -> Optional[str]:
     """Generate a completion message using LLM with fallback."""
-    script_dir = Path(__file__).parent
-    llm_dir = script_dir / "llm"
+    llm_dir = os.path.expanduser("~/.claude/utils/llm")
 
     if os.getenv("OPENAI_API_KEY"):
         result = subprocess.run(
-            [str(llm_dir / "oai.py"), "--completion"],
+            [os.path.join(llm_dir, "oai.py"), "--completion"],
             capture_output=True,
             text=True,
             timeout=15,
@@ -64,7 +61,7 @@ def generate_completion_message(hook_name: str = "llm_manager") -> Optional[str]
 
     if os.getenv("ANTHROPIC_API_KEY"):
         result = subprocess.run(
-            [str(llm_dir / "anth.py"), "--completion"],
+            [os.path.join(llm_dir, "anth.py"), "--completion"],
             capture_output=True,
             text=True,
             timeout=15,

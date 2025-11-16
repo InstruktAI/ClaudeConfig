@@ -30,18 +30,34 @@ def count_messages(transcript_path: str) -> int:
         return 0
 
 
-def get_last_assistant_message(transcript_path: str) -> Optional[str]:
+def get_last_assistant_message(transcript_path: str, last_only: bool = False) -> Optional[str]:
     """
-    Extract all assistant text responses since the last user input.
+    Extract assistant text responses since the last user input.
 
     Args:
         transcript_path: Path to JSONL transcript file
+        last_only: If True, return only the very last assistant message.
+                   If False, return all assistant messages since last user input.
 
     Returns:
-        All assistant text since last user input, or None if not found
+        Assistant text(s), or None if not found
     """
     if not transcript_path or not os.path.exists(transcript_path):
         return None
+
+    def clean_text(text: str) -> str:
+        """Remove system metadata lines from assistant messages."""
+        lines = text.split("\n")
+        cleaned_lines = []
+        for line in lines:
+            # Skip lines that are just system metadata
+            stripped = line.strip()
+            if stripped.startswith("Project root:"):
+                continue
+            if stripped.startswith("**Project root:"):
+                continue
+            cleaned_lines.append(line)
+        return "\n".join(cleaned_lines).strip()
 
     try:
         entries = []
@@ -55,6 +71,22 @@ def get_last_assistant_message(transcript_path: str) -> Optional[str]:
                     entries.append(entry)
                 except json.JSONDecodeError:
                     continue
+
+        if last_only:
+            # Just get the very last assistant message
+            for i in range(len(entries) - 1, -1, -1):
+                entry = entries[i]
+                if entry.get("type") == "assistant":
+                    message = entry.get("message", {})
+                    content = message.get("content", [])
+                    if isinstance(content, list):
+                        text_parts = [block.get("text", "") for block in content if block.get("type") == "text"]
+                        if text_parts:
+                            full_text = " ".join(text_parts)
+                            cleaned = clean_text(full_text)
+                            if cleaned:
+                                return cleaned
+            return None
 
         # Find the last user message
         last_user_idx = -1
@@ -84,10 +116,9 @@ def get_last_assistant_message(transcript_path: str) -> Optional[str]:
         return None
 
 
-def transcript_to_array(transcript_path: str) -> list:
+def transcript_to_array(transcript_path: str) -> list[dict[str, object]]:
     """
     Convert JSONL transcript to array of entries.
-    Used for --chat flag in various hooks.
 
     Args:
         transcript_path: Path to JSONL transcript file

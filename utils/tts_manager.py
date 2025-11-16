@@ -7,7 +7,6 @@ Priority order: ElevenLabs > OpenAI > pyttsx3
 import os
 import subprocess
 import time
-from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -25,30 +24,29 @@ def get_tts_script_path() -> Optional[str]:
     Returns:
         Path to TTS script, or None if none available
     """
-    script_dir = Path(__file__).parent
-    tts_dir = script_dir / "tts"
+    tts_dir = os.path.expanduser("~/.claude/utils/tts")
 
     # Check for macOS say (highest priority - native, reliable)
-    macos_say_script = tts_dir / "macos_say_tts.py"
-    if macos_say_script.exists():
-        return str(macos_say_script)
+    macos_say_script = os.path.join(tts_dir, "macos_say_tts.py")
+    if os.path.exists(macos_say_script):
+        return macos_say_script
 
     # Check for ElevenLabs API key
     if os.getenv("ELEVENLABS_API_KEY"):
-        elevenlabs_script = tts_dir / "elevenlabs_tts.py"
-        if elevenlabs_script.exists():
-            return str(elevenlabs_script)
+        elevenlabs_script = os.path.join(tts_dir, "elevenlabs_tts.py")
+        if os.path.exists(elevenlabs_script):
+            return elevenlabs_script
 
     # Check for OpenAI API key
     if os.getenv("OPENAI_API_KEY"):
-        openai_script = tts_dir / "openai_tts.py"
-        if openai_script.exists():
-            return str(openai_script)
+        openai_script = os.path.join(tts_dir, "openai_tts.py")
+        if os.path.exists(openai_script):
+            return openai_script
 
     # Fall back to pyttsx3 (no API key required)
-    pyttsx3_script = tts_dir / "pyttsx3_tts.py"
-    if pyttsx3_script.exists():
-        return str(pyttsx3_script)
+    pyttsx3_script = os.path.join(tts_dir, "pyttsx3_tts.py")
+    if os.path.exists(pyttsx3_script):
+        return pyttsx3_script
 
     return None
 
@@ -65,17 +63,16 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
 
     Example: TTS_SERVICE=openai,macos,pyttsx3
     """
-    script_dir = Path(__file__).parent
-    tts_dir = script_dir / "tts"
+    tts_dir = os.path.expanduser("~/.claude/utils/tts")
 
     service_priority = os.getenv("TTS_SERVICE", "macos")
     service_names = [s.strip().lower() for s in service_priority.split(",")]
 
     service_map = {
-        "macos": ("macOS say", tts_dir / "macos_say_tts.py"),
-        "openai": ("OpenAI", tts_dir / "openai_tts_simple.py"),
-        "elevenlabs": ("ElevenLabs", tts_dir / "elevenlabs_tts.py"),
-        "pyttsx3": ("pyttsx3", tts_dir / "pyttsx3_tts.py"),
+        "macos": ("macOS say", os.path.join(tts_dir, "macos_say_tts.py")),
+        "openai": ("OpenAI", os.path.join(tts_dir, "openai_tts_simple.py")),
+        "elevenlabs": ("ElevenLabs", os.path.join(tts_dir, "elevenlabs_tts.py")),
+        "pyttsx3": ("pyttsx3", os.path.join(tts_dir, "pyttsx3_tts.py")),
     }
 
     log.debug(f"Speaking: {text} (priority: {service_priority})", hook_name, session_id)
@@ -93,17 +90,21 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
 
         try:
             # Run TTS via queue runner to ensure sequential FIFO playback
-            queue_runner = Path(__file__).parent / "tts_queue_runner.py"
+            python_path = os.path.expanduser("~/.claude/.venv/bin/python")
+            queue_runner = os.path.expanduser("~/.claude/utils/tts_queue_runner.py")
             job_id = f"{time.time_ns()}"
-            subprocess.Popen(
-                [str(queue_runner), str(script_path), text, job_id],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+            log.debug(
+                f"Calling: {python_path} {queue_runner} {script_path} '{text[:50]}...' {job_id}", hook_name, session_id
             )
-            log.debug(f"TTS queued via {service_name}", hook_name, session_id)
+            result = subprocess.Popen(
+                [python_path, queue_runner, script_path, text, job_id],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            log.debug(f"TTS queued via {service_name} (pid: {result.pid})", hook_name, session_id)
             return True
         except Exception as e:
-            log.warn(f"{service_name} error", hook_name, session_id, error=e)
+            log.error(f"{service_name} error: {e}", hook_name, session_id, error=e)
 
     log.error("All TTS services failed", hook_name, session_id)
     return False

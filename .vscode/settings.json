@@ -1,0 +1,35 @@
+{
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.addMissingImports": "always",
+      "source.fixAll": "always",
+      "source.fixAll.unusedImports": "always",
+      "source.organizeImports": "always"
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.tabSize": 4
+  },
+  "black-formatter.importStrategy": "fromEnvironment",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "isort.check": true,
+  "isort.importStrategy": "fromEnvironment",
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "mypy-type-checker.reportingScope": "workspace",
+  "mypy-type-checker.args": [ "--config-file", "pyproject.toml" ],
+  "mypy-type-checker.path": [ ".venv/bin/mypy" ],
+  "python.analysis.autoImportCompletions": true,
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [ "tests" ],
+  "files.associations": {
+    "*.yml": "yaml"
+  },
+  "files.exclude": {
+    "**/.history": false
+  },
+  "jupyter.debugJustMyCode": false,
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
+}

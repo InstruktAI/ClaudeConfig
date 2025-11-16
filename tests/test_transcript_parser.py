@@ -117,6 +117,106 @@ def test_get_last_assistant_message_only_latest():
         Path(path).unlink()
 
 
+def test_get_last_assistant_message_with_last_only_flag():
+    """Tests last_only flag to get only very last message"""
+    with NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
+        f.write(
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {"role": "assistant", "content": [{"type": "text", "text": "First response"}]},
+                }
+            )
+            + "\n"
+        )
+        f.write(json.dumps({"type": "user", "message": {"role": "user", "content": "Question"}}) + "\n")
+        f.write(
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {"role": "assistant", "content": [{"type": "text", "text": "Second response"}]},
+                }
+            )
+            + "\n"
+        )
+        f.write(
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {"role": "assistant", "content": [{"type": "text", "text": "Third response"}]},
+                }
+            )
+            + "\n"
+        )
+        path = f.name
+
+    try:
+        message = get_last_assistant_message(path, last_only=True)
+        assert message == "Third response"
+    finally:
+        Path(path).unlink()
+
+
+def test_get_last_assistant_message_filters_project_root():
+    """Filters out Project root: system metadata lines"""
+    with NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
+        f.write(
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Project root: /Users/test/.claude\n\nI'm ready to help you.",
+                            }
+                        ],
+                    },
+                }
+            )
+            + "\n"
+        )
+        path = f.name
+
+    try:
+        message = get_last_assistant_message(path, last_only=True)
+        assert message == "I'm ready to help you."
+        assert "Project root:" not in message
+    finally:
+        Path(path).unlink()
+
+
+def test_get_last_assistant_message_filters_markdown_project_root():
+    """Filters out **Project root:** markdown metadata lines"""
+    with NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
+        f.write(
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "**Project root: /Users/test/.claude**\n\nReady to assist.",
+                            }
+                        ],
+                    },
+                }
+            )
+            + "\n"
+        )
+        path = f.name
+
+    try:
+        message = get_last_assistant_message(path, last_only=True)
+        assert message == "Ready to assist."
+        assert "Project root:" not in message
+    finally:
+        Path(path).unlink()
+
+
 def test_transcript_to_array():
     """Converts JSONL to array"""
     with NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:

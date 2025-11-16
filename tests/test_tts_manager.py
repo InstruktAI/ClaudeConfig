@@ -22,11 +22,12 @@ def test_speak_respects_service_priority(monkeypatch):
     with patch("subprocess.Popen") as mock_popen:
         speak("Test", "test_hook")
 
-        # Should call queue runner with macos script path
+        # Should call python with queue runner and macos script path
         assert mock_popen.called
         args = mock_popen.call_args[0][0]
-        assert "tts_queue_runner.py" in str(args[0])
-        assert "macos_say_tts.py" in str(args[1])
+        assert "python" in str(args[0])
+        assert "tts_queue_runner.py" in str(args[1])
+        assert "macos_say_tts.py" in str(args[2])
 
 
 def test_speak_passes_text_to_subprocess(monkeypatch):

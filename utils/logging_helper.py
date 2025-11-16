@@ -14,7 +14,6 @@ Configuration:
 
 import os
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -25,11 +24,11 @@ load_dotenv()
 _LEVELS = {"debug": 0, "info": 1, "warn": 2, "error": 3}
 
 
-def _get_log_path() -> Path:
+def _get_log_path() -> str:
     """Get the unified log file path at ~/.claude/logs/hooks.log"""
-    log_dir = Path.home() / ".claude" / "logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
-    return log_dir / "hooks.log"
+    log_dir = os.path.expanduser("~/.claude/logs")
+    os.makedirs(log_dir, exist_ok=True)
+    return os.path.join(log_dir, "hooks.log")
 
 
 def _get_min_level() -> int:

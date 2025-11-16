@@ -11,11 +11,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/notification.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/notification.py"
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type Notification --summarize "
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type Notification --summarize "
           }
         ]
       }
@@ -25,11 +25,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/session_start.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/session_start.py"
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionStart"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionStart"
           }
         ]
       }
@@ -39,11 +39,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/session_end.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/session_end.py"
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionEnd"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionEnd"
           }
         ]
       }
@@ -53,11 +53,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/stop.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/stop.py"
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type Stop --add-chat"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type Stop --add-chat"
           }
         ]
       }
@@ -67,11 +67,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/subagent_stop.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/subagent_stop.py"
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type SubagentStop"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type SubagentStop"
           }
         ]
       }
@@ -85,7 +85,7 @@
           },
           {
             "type": "command",
-            "command": ".venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type UserPromptSubmit --summarize"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type UserPromptSubmit --summarize"
           }
         ]
       }
