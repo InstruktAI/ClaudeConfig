@@ -4,10 +4,10 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 ## 0. Project Awareness
 
-1. Always follow the project’s existing configuration (pyproject, tsconfig, eslint, ruff, etc.).
+1. Always follow the project's existing configuration (pyproject, tsconfig, eslint, ruff, etc.).
 2. Use only approved dependencies, import patterns, naming, and formatting.
-3. Mirror the repository’s structure and conventions.
-4. Never invent frameworks, utilities, or abstractions not in the project.
+3. Mirror the repository's structure and conventions.
+4. Don't introduce new frameworks or architectural patterns.
 
 ## 1. Architecture & Structure
 
@@ -59,8 +59,8 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 ## 6. Simplicity & Abstraction
 
 1. Keep it simple: the simplest working solution first.
-2. Avoid repetition only after three or more identical patterns.
-3. Prefer duplication over wrong abstraction.
+2. Never duplicate code. Extract to components/functions on second use.
+3. Simple extraction beats complex abstraction. Extract now, refine later.
 4. Build only for current requirements (YAGNI).
 5. Keep files and functions short and clear.
 
