@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def test_stop_hook_timing():
-    """Test that stop hook returns immediately when not notifying."""
+    """Test that stop hook completes successfully with LLM calls."""
     hook_path = Path.home() / ".claude" / "hooks" / "stop.py"
 
     test_input = {"session_id": "test-session", "transcript_path": ""}
@@ -18,7 +18,7 @@ def test_stop_hook_timing():
     start = time.time()
 
     result = subprocess.run(
-        [str(hook_path)],  # Without --notify, no LLM calls
+        [str(hook_path)],  # Always makes LLM calls and TTS
         input=json.dumps(test_input).encode(),
         capture_output=True,
         timeout=5,
@@ -30,16 +30,13 @@ def test_stop_hook_timing():
     print(f"Hook returned in {elapsed:.3f} seconds")
     print(f"Exit code: {result.returncode}")
 
-    # Hook should return immediately when just logging
-    assert elapsed < 0.5, f"Hook took {elapsed:.3f}s - should return immediately"
+    # Hook should complete within timeout (includes LLM API calls)
+    assert elapsed < 4.0, f"Hook took {elapsed:.3f}s - exceeded timeout"
+    assert result.returncode == 0, f"Hook failed with exit code {result.returncode}"
 
-    print(f"✅ PASSED: Hook returned in {elapsed:.3f}s")
+    print(f"✅ PASSED: Hook completed in {elapsed:.3f}s")
 
-    # Wait a bit to see if background work happens
-    print("Waiting 3s for background work...")
-    time.sleep(3)
-
-    # Check logs to see if work completed
+    # Check logs to confirm hook execution
     log_path = Path.home() / ".claude" / "logs" / "hooks.log"
     if log_path.exists():
         with open(log_path, "r") as f:

@@ -1,4 +1,4 @@
-#!.venv/bin/python
+#!/Users/Morriz/.claude/.venv/bin/python
 
 import os
 import sys

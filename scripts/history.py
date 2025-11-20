@@ -1,4 +1,4 @@
-#!.venv/bin/python
+#!/Users/Morriz/.claude/.venv/bin/python
 
 """
 Parse and display Claude Code conversation history from history.jsonl
