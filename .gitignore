@@ -40,6 +40,9 @@ todos/
 history.jsonl
 version_check_cache
 
+# Temporary files
+.tmp/
+
 # project specific
 id.md
 uv.lock
