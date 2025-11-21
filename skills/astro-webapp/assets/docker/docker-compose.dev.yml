@@ -1,0 +1,86 @@
+# docker-compose.yml - Development environment for Astro projects
+# Provides hot-reloading and volume mounting for development
+
+version: '3.8'
+
+services:
+  # Development server with hot reloading
+  astro-dev:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "4321:4321"
+    volumes:
+      # Mount source code
+      - .:/app
+      # Named volume for node_modules to avoid conflicts
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      - PORT=4321
+      # Add your env variables here or use env_file
+      - PUBLIC_SITE_URL=http://localhost:4321
+    env_file:
+      - .env
+    networks:
+      - astro-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4321"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Database service (PostgreSQL example)
+  # Uncomment if your Astro app needs a database
+  # postgres:
+  #   image: postgres:15-alpine
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=astro
+  #     - POSTGRES_PASSWORD=astro
+  #     - POSTGRES_DB=astro_db
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - astro-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U astro"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Redis for caching/sessions
+  # Uncomment if needed
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - astro-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Email service (Mailhog for development)
+  # Uncomment to test email functionality locally
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   ports:
+  #     - "1025:1025"  # SMTP server
+  #     - "8025:8025"  # Web UI
+  #   networks:
+  #     - astro-network
+
+volumes:
+  node_modules:
+  # postgres_data:
+
+networks:
+  astro-network:
+    driver: bridge

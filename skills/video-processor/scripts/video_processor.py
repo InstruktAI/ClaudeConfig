@@ -1,4 +1,4 @@
-#!.venv/bin/python
+#!/Users/Morriz/.claude/.venv/bin/python
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Optional
 
 import click
-import ffmpeg
+import ffmpeg  # pylint: disable=import-error
 
 
 def check_ffmpeg() -> bool:
@@ -281,7 +281,7 @@ def transcribe(
 
     if not check_whisper():
         raise click.ClickException(
-            "OpenAI Whisper is not installed. Please install it:\n" "  pip install -U openai-whisper"
+            "OpenAI Whisper is not installed. Please install it:\n  pip install -U openai-whisper"
         )
 
     input_path = validate_input_file(input_file)

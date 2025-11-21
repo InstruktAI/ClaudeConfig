@@ -1,0 +1,53 @@
+{
+  "editor.formatOnSave": true,
+  "editor.quickSuggestionsDelay": 2000,
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.local": "dotenv"
+  },
+  "files.exclude": {
+    "**/.history": true
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "docker.docker"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.tabSize": 4
+  },
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json][jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "files.eol": "\n"
+    // "editor.defaultFormatter": "mkhl.shfmt"
+  },
+  "[yaml][yml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.format.enable": true,
+  "eslint.validate": [ "javascript", "javascriptreact", "typescript", "typescriptreact" ],
+  "tailwindCSS.classAttributes": [ "class", "className", ".*ClassName" ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "lib/db/schema.ts",
+        "cmd": "pnpm drizzle:generate && pnpm drizzle:migrate"
+      }
+    ]
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

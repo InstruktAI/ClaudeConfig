@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "christian-kohler.path-intellisense",
+    "csstools.postcss",
+    "dbaeumer.vscode-eslint",
+    "emeraldwalk.runonsave",
+    "github.vscode-github-actions",
+    "mikestead.dotenv",
+    "ms-vscode.vscode-typescript-next",
+    "streetsidesoftware.code-spell-checker",
+    "yoavbls.pretty-ts-errors",
+    "xyz.local-history"
+  ]
+}

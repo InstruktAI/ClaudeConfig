@@ -1,0 +1,231 @@
+---
+// Navigation.astro - Responsive navigation with mobile menu and dropdown support
+export interface Props {
+  logo?: string;
+  logoText?: string;
+  sticky?: boolean;
+}
+
+const { logo, logoText = "Brand", sticky = false } = Astro.props;
+
+// Navigation structure with optional dropdowns
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  {
+    label: 'Services',
+    href: '/services',
+    dropdown: [
+      { label: 'Web Design', href: '/services/web-design' },
+      { label: 'Development', href: '/services/development' },
+      { label: 'Consulting', href: '/services/consulting' },
+    ]
+  },
+  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Contact', href: '/contact' },
+];
+
+const currentPath = Astro.url.pathname;
+
+// Check if a path is active
+const isActive = (href: string) => {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+};
+---
+
+<nav class={`bg-white shadow-lg ${sticky ? 'sticky top-0 z-50' : ''}`}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <!-- Logo -->
+      <div class="flex-shrink-0 flex items-center">
+        <a href="/" class="flex items-center space-x-2">
+          {logo ? (
+            <img src={logo} alt={logoText} class="h-8 w-auto" />
+          ) : (
+            <span class="text-2xl font-bold text-blue-600">{logoText}</span>
+          )}
+        </a>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex lg:items-center lg:space-x-1">
+        {navItems.map((item) => (
+          <div class="relative group">
+            <a 
+              href={item.href}
+              class={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center
+                ${isActive(item.href)
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'}`}
+            >
+              {item.label}
+              {item.dropdown && (
+                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              )}
+            </a>
+            
+            {/* Dropdown Menu */}
+            {item.dropdown && (
+              <div class="absolute left-0 mt-1 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left">
+                <div class="bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 py-1">
+                  {item.dropdown.map((subItem) => (
+                    <a 
+                      href={subItem.href}
+                      class={`block px-4 py-2 text-sm
+                        ${isActive(subItem.href)
+                          ? 'text-blue-600 bg-blue-50'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                    >
+                      {subItem.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        
+        <!-- CTA Button -->
+        <a 
+          href="/get-started"
+          class="ml-4 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Get Started
+        </a>
+      </div>
+      
+      <!-- Mobile menu button -->
+      <div class="lg:hidden flex items-center">
+        <button 
+          id="mobile-menu-button"
+          class="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          aria-label="Toggle menu"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path 
+              id="menu-open-icon"
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M4 6h16M4 12h16M4 18h16" 
+            />
+            <path 
+              id="menu-close-icon"
+              class="hidden"
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden lg:hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1">
+      {navItems.map((item) => (
+        <div>
+          <a 
+            href={item.href}
+            class={`block px-3 py-2 rounded-md text-base font-medium
+              ${isActive(item.href)
+                ? 'bg-blue-100 text-blue-600' 
+                : 'text-gray-700 hover:bg-gray-100'}`}
+          >
+            {item.label}
+          </a>
+          {/* Mobile Dropdown Items */}
+          {item.dropdown && (
+            <div class="ml-4 mt-1 space-y-1">
+              {item.dropdown.map((subItem) => (
+                <a 
+                  href={subItem.href}
+                  class={`block px-3 py-2 rounded-md text-sm
+                    ${isActive(subItem.href)
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-gray-600 hover:bg-gray-50'}`}
+                >
+                  {subItem.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+      
+      <!-- Mobile CTA Button -->
+      <a 
+        href="/get-started"
+        class="block mx-2 px-4 py-2 bg-blue-600 text-white text-center font-medium rounded-md hover:bg-blue-700"
+      >
+        Get Started
+      </a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle
+  const button = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+  const openIcon = document.getElementById('menu-open-icon');
+  const closeIcon = document.getElementById('menu-close-icon');
+  
+  button?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    
+    if (isOpen) {
+      menu?.classList.add('hidden');
+      openIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+    } else {
+      menu?.classList.remove('hidden');
+      openIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+    }
+  });
+  
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (!button?.contains(target) && !menu?.contains(target)) {
+      menu?.classList.add('hidden');
+      openIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+    }
+  });
+  
+  // Close mobile menu on escape key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      menu?.classList.add('hidden');
+      openIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+    }
+  });
+</script>
+
+<style>
+  /* Optional: Add smooth height animation for mobile menu */
+  #mobile-menu {
+    transition: max-height 0.3s ease-out;
+  }
+  
+  /* Ensure dropdowns work on touch devices */
+  @media (hover: none) {
+    .group:hover .group-hover\:opacity-100 {
+      opacity: 0;
+    }
+    .group:focus-within .group-hover\:opacity-100 {
+      opacity: 100;
+      visibility: visible;
+    }
+  }
+</style>

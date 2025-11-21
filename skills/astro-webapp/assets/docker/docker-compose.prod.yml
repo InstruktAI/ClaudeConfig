@@ -1,0 +1,163 @@
+# docker-compose.prod.yml - Production deployment with Traefik
+# Includes reverse proxy, SSL, and monitoring
+
+version: '3.8'
+
+services:
+  # Main Astro application
+  astro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner-static  # or runner-node for SSR
+    restart: unless-stopped
+    networks:
+      - web
+      - internal
+    labels:
+      # Traefik configuration
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.astro.entrypoints=websecure"
+      - "traefik.http.routers.astro.tls.certresolver=letsencrypt"
+      - "traefik.http.services.astro.loadbalancer.server.port=80"  # or 4321 for Node
+      # Security headers
+      - "traefik.http.middlewares.astro-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.astro-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.astro-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.astro-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      - "traefik.http.middlewares.astro-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.astro-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.astro-headers.headers.stsPreload=true"
+      - "traefik.http.routers.astro.middlewares=astro-headers"
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_SITE_URL=https://${DOMAIN}
+    env_file:
+      - .env.production
+    depends_on:
+      - traefik
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Traefik reverse proxy
+  traefik:
+    image: traefik:v3.0
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080"  # Uncomment for Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./acme.json:/acme.json
+    networks:
+      - web
+    labels:
+      # Secure Traefik dashboard (optional)
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_AUTH}"
+
+  # Optional: Database (PostgreSQL)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=${DB_USER}
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #     - POSTGRES_DB=${DB_NAME}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./backup:/backup
+  #   networks:
+  #     - internal
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Redis for caching/sessions
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   command: redis-server --requirepass ${REDIS_PASSWORD}
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - internal
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "--auth", "${REDIS_PASSWORD}", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Monitoring with Prometheus & Grafana
+  # prometheus:
+  #   image: prom/prometheus
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   networks:
+  #     - internal
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+
+  # grafana:
+  #   image: grafana/grafana
+  #   restart: unless-stopped
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+  #     - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN}
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - web
+  #     - internal
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)"
+  #     - "traefik.http.routers.grafana.entrypoints=websecure"
+  #     - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+
+  # Backup service (runs daily at 3 AM)
+  # backup:
+  #   image: alpine:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - postgres_data:/source/postgres:ro
+  #     - redis_data:/source/redis:ro
+  #     - ./backup:/backup
+  #   entrypoint: |
+  #     sh -c 'while true; do
+  #       echo "Running backup at $$(date)"
+  #       tar -czf /backup/backup-$$(date +%Y%m%d-%H%M%S).tar.gz /source/
+  #       find /backup -type f -mtime +7 -delete
+  #       sleep 86400
+  #     done'
+  #   networks:
+  #     - internal
+
+volumes:
+  # postgres_data:
+  # redis_data:
+  # prometheus_data:
+  # grafana_data:
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
