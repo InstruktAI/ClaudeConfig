@@ -18,6 +18,10 @@
   "mypy-type-checker.args": [ "--config-file", "pyproject.toml" ],
   "mypy-type-checker.path": [ ".venv/bin/mypy" ],
   "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
+  },
   "python.defaultInterpreterPath": ".venv/bin/python",
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,

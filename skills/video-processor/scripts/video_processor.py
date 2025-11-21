@@ -347,7 +347,7 @@ def transcribe(
             whisper_cmd.append("False")
 
         # Run Whisper
-        result = subprocess.run(whisper_cmd, capture_output=not verbose, text=True, check=True)
+        subprocess.run(whisper_cmd, capture_output=not verbose, text=True, check=True)
 
         # Whisper creates output with original filename - rename to desired output
         whisper_output = audio_file.parent / f"{audio_file.stem}.{output_format}"

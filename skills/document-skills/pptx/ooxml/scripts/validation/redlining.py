@@ -153,6 +153,7 @@ class RedliningValidator:
                     ],
                     capture_output=True,
                     text=True,
+                    check=False,
                 )
 
                 if result.stdout.strip():
@@ -184,6 +185,7 @@ class RedliningValidator:
                     ],
                     capture_output=True,
                     text=True,
+                    check=False,
                 )
 
                 if result.stdout.strip():

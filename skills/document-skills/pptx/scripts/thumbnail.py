@@ -220,6 +220,7 @@ def convert_to_images(pptx_path, temp_dir, dpi):
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0 or not pdf_path.exists():
         raise RuntimeError("PDF conversion failed")
@@ -230,6 +231,7 @@ def convert_to_images(pptx_path, temp_dir, dpi):
         ["pdftoppm", "-jpeg", "-r", str(dpi), str(pdf_path), str(temp_dir / "slide")],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         raise RuntimeError("Image conversion failed")

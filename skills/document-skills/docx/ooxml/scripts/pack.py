@@ -112,6 +112,7 @@ def validate_document(doc_path):
                 capture_output=True,
                 timeout=10,
                 text=True,
+                check=False,
             )
             if not (Path(temp_dir) / f"{doc_path.stem}.html").exists():
                 error_msg = result.stderr.strip() or "Document validation failed"
