@@ -20,13 +20,21 @@ def main() -> None:
         summary = None
         if transcript_path:
             last_message = get_last_assistant_message(transcript_path)
+            log.debug(f"Last assistant message length: {len(last_message) if last_message else 0}", "stop", session_id)
             if last_message:
                 summary = summarize_text(last_message, "stop")
+                log.debug(f"Summary generated: {summary}", "stop", session_id)
+            else:
+                log.debug("No assistant message found in transcript", "stop", session_id)
+        else:
+            log.debug("No transcript path provided", "stop", session_id)
 
         completion_message = generate_completion_message("stop")
 
         if summary:
             speak(summary, "stop", session_id)
+        else:
+            log.debug("No summary to speak", "stop", session_id)
 
         speak(completion_message, "stop", session_id)
 
