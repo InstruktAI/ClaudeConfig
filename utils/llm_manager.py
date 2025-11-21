@@ -11,6 +11,8 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
+from utils.logging_helper import log
+
 load_dotenv()
 
 
@@ -20,27 +22,40 @@ def prompt(text: str, hook_name: str = "llm_manager") -> Optional[str]:
     llm_dir = os.path.expanduser("~/.claude/utils/llm")
 
     if os.getenv("OPENAI_API_KEY"):
-        result = subprocess.run(
-            [os.path.join(llm_dir, "oai.py"), text],
-            capture_output=True,
-            text=True,
-            timeout=15,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
+        try:
+            result = subprocess.run(
+                [os.path.join(llm_dir, "oai.py"), text],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+            log.debug("OpenAI call failed, trying Anthropic", hook_name)
+        except subprocess.TimeoutExpired:
+            log.warn("OpenAI call timed out after 15s", hook_name)
+        except Exception as e:
+            log.error(f"OpenAI call error: {e}", hook_name, error=e)
 
     if os.getenv("ANTHROPIC_API_KEY"):
-        result = subprocess.run(
-            [os.path.join(llm_dir, "anth.py"), text],
-            capture_output=True,
-            text=True,
-            timeout=15,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
+        try:
+            result = subprocess.run(
+                [os.path.join(llm_dir, "anth.py"), text],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+            log.debug("Anthropic call failed", hook_name)
+        except subprocess.TimeoutExpired:
+            log.warn("Anthropic call timed out after 15s", hook_name)
+        except Exception as e:
+            log.error(f"Anthropic call error: {e}", hook_name, error=e)
 
+    log.error("All LLM providers failed", hook_name)
     return None
 
 
@@ -49,28 +64,39 @@ def generate_completion_message(hook_name: str = "llm_manager") -> Optional[str]
     llm_dir = os.path.expanduser("~/.claude/utils/llm")
 
     if os.getenv("OPENAI_API_KEY"):
-        result = subprocess.run(
-            [os.path.join(llm_dir, "oai.py"), "--completion"],
-            capture_output=True,
-            text=True,
-            timeout=15,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
+        try:
+            result = subprocess.run(
+                [os.path.join(llm_dir, "oai.py"), "--completion"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            log.warn("OpenAI completion timed out", hook_name)
+        except Exception as e:
+            log.error(f"OpenAI completion error: {e}", hook_name, error=e)
 
     if os.getenv("ANTHROPIC_API_KEY"):
-        result = subprocess.run(
-            [os.path.join(llm_dir, "anth.py"), "--completion"],
-            capture_output=True,
-            text=True,
-            timeout=15,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
+        try:
+            result = subprocess.run(
+                [os.path.join(llm_dir, "anth.py"), "--completion"],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            log.warn("Anthropic completion timed out", hook_name)
+        except Exception as e:
+            log.error(f"Anthropic completion error: {e}", hook_name, error=e)
 
     # Fallback to random message
+    log.debug("Using fallback completion message", hook_name)
     messages = [
         "Work complete!",
         "All done!",
@@ -81,7 +107,7 @@ def generate_completion_message(hook_name: str = "llm_manager") -> Optional[str]
     return random.choice(messages)
 
 
-def summarize_text(text: str, hook_name: str = "llm_manager", max_words: int = 20) -> Optional[str]:
+def summarize_text(text: str, hook_name: str = "llm_manager", max_words: int = 10) -> Optional[str]:
     """Summarize text using LLM."""
     if not text:
         return None
@@ -90,7 +116,7 @@ def summarize_text(text: str, hook_name: str = "llm_manager", max_words: int = 2
     if len(text) > 2000:
         text = "..." + text[-2000:]
 
-    prompt_text = f"""You just completed some work. Summarize what you accomplished in {max_words} words or less, speaking in first person as if you just finished the task.
+    prompt_text = f"""You just completed some work. Summarize what you accomplished in {max_words} words or less, speaking in first person as if you just finished the task. Be concise and focus on the key outcome only.
 
 Your response:
 {text}"""
