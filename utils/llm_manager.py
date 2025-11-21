@@ -116,7 +116,34 @@ def summarize_text(text: str, hook_name: str = "llm_manager", max_words: int = 1
     if len(text) > 2000:
         text = "..." + text[-2000:]
 
-    prompt_text = f"""You just completed some work. Summarize what you accomplished in {max_words} words or less, speaking in first person as if you just finished the task. Be concise and focus on the key outcome only.
+    # Detect activity type from content
+    lower_text = text.lower()
+    is_planning = any(
+        phrase in lower_text
+        for phrase in [
+            "i'll",
+            "let me",
+            "i'm going to",
+            "here's the plan",
+            "we can",
+            "we should",
+            "we need to",
+            "first",
+            "next step",
+        ]
+    )
+    is_analysis = any(
+        phrase in lower_text for phrase in ["analysis", "investigating", "found that", "it appears", "the issue is"]
+    )
+
+    if is_planning:
+        verb_phrase = "what you proposed"
+    elif is_analysis:
+        verb_phrase = "what you found"
+    else:
+        verb_phrase = "what you accomplished"
+
+    prompt_text = f"""Summarize {verb_phrase} in {max_words} words or less, speaking in first person. Be concise and focus on the key outcome only.
 
 Your response:
 {text}"""

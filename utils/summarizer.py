@@ -1,4 +1,4 @@
-#!.venv/bin/python
+#!/Users/Morriz/.claude/.venv/bin/python
 
 import json
 from typing import Any, Dict, Optional
@@ -24,29 +24,13 @@ def generate_event_summary(event_data: Dict[str, Any]) -> Optional[str]:
     if len(payload_str) > 1000:
         payload_str = payload_str[:1000] + "..."
 
-    prompt = f"""Generate a one-sentence summary of this Claude Code hook event payload for an engineer monitoring the system.
+    prompt = f"""Summarize this Claude Code hook event in one sentence (no period).
 
 Event Type: {event_type}
 Payload:
 {payload_str}
 
-Requirements:
-- ONE sentence only (no period at the end)
-- Focus on the key action or information in the payload
-- Be specific and technical
-- Keep under 15 words
-- Use present tense
-- No quotes or formatting
-- Return ONLY the summary text
-- First person, as you did the work
-
-Examples:
-- Reading configuration file from project root
-- Executing npm install to update dependencies
-- Searching web for React documentation
-- Editing database schema to add user table
-- Responding with implementation plan
-Generate the summary based on the payload:"""
+Keep it under 15 words, first person, technical, no quotes:"""
 
     summary = prompt_llm(prompt)
 
