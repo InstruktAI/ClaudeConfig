@@ -1,72 +1,73 @@
 ---
 name: worktree-manager-skill
-description: Comprehensive git worktree management. Use when the user wants to create, remove, list, or manage worktrees. Handles all worktree operations including creation, deletion, and status checking.
-allowed-tools: SlashCommand, Bash, Read, Write, Edit, Glob, Grep
+description: Manage git worktrees with consistent conventions. Use when the user wants to create, list, or remove worktrees in any git repository.
+allowed-tools: SlashCommand
 ---
 
 # Worktree Manager Skill
 
-Complete worktree lifecycle management for parallel development environments with isolated ports, databases, and configuration.
+Manage git worktrees with enforced conventions for consistent directory structure across all projects.
 
-## When to use this skill
+## Purpose
+
+Ensure all worktrees are created in a standardized `trees/` directory, preventing inconsistency across sessions and projects.
+
+## When to Use
 
 Use this skill when the user wants to:
 - **Create** a new worktree for parallel development
-- **Remove** an existing worktree
-- **List** all worktrees and their status
-- **Check** worktree configuration or status
-- **Manage** multiple parallel development environments
+- **List** existing worktrees and their status
+- **Remove** a worktree (with optional branch deletion)
 
-**Do NOT use this skill when:**
-- User asks for a specific subagent or skill delegation
-- User wants to manually use git commands directly
-- The task is unrelated to worktree management
+## Operations
 
-## Operations Overview
+### Create Worktree
+**Keywords:** create, new, setup, make, add worktree
 
-This skill manages three core worktree operations:
+**Action:** Use `/create_worktree <branch-name>`
 
-| Operation | Command | When to Use |
-|-----------|---------|-------------|
-| **Create** | `/create_worktree` | User wants a new parallel environment |
-| **List** | `/list_worktrees` | User wants to see existing worktrees |
-| **Remove** | `/remove_worktree` | User wants to delete a worktree |
+**What it does:**
+- Creates worktree in `trees/<branch-name>`
+- Creates branch if it doesn't exist
+- Ensures `trees/` is in .gitignore
+- Reports location and next steps
 
-## Decision Tree: Which Command to Use
+### List Worktrees
+**Keywords:** list, show, display, status, which worktrees
 
-### 1. User wants to CREATE a worktree
-**Keywords:** create, new, setup, make, build, start, initialize
-**Action:** Use `/create_worktree <branch-name> [port-offset]`
-
-### 2. User wants to LIST worktrees
-**Keywords:** list, show, display, what, which, status, check, view
 **Action:** Use `/list_worktrees`
 
-### 3. User wants to REMOVE a worktree
-**Keywords:** remove, delete, cleanup, destroy, stop, kill, terminate
+**What it does:**
+- Shows main repository status
+- Lists all worktrees in `trees/`
+- Displays branch and commit info
+- Provides quick command references
+
+### Remove Worktree
+**Keywords:** remove, delete, cleanup, destroy worktree
+
 **Action:** Use `/remove_worktree <branch-name>`
 
-## Quick Start
+**What it does:**
+- Removes worktree from `trees/`
+- Checks for uncommitted changes
+- Optionally deletes the branch
+- Safe with confirmation prompts
 
-For step-by-step operation instructions, see [OPERATIONS.md](OPERATIONS.md).
+## Examples
 
-For detailed examples and usage patterns, see [EXAMPLES.md](EXAMPLES.md).
+**User:** "Create a worktree for feature-auth"
+**Action:** `/create_worktree feature-auth`
 
-For troubleshooting and common issues, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+**User:** "Show me all my worktrees"
+**Action:** `/list_worktrees`
 
-For technical details and quick reference, see [REFERENCE.md](REFERENCE.md).
+**User:** "Remove the feature-auth worktree"
+**Action:** `/remove_worktree feature-auth`
 
 ## Important Notes
 
-### Do NOT attempt to:
-- Create worktrees manually with git commands
-- Manually configure ports or environment files
-- Use bash to remove directories directly
-- Manage worktree processes manually
-
-### Always use the slash commands because they:
-- Handle all configuration automatically
-- Ensure port uniqueness
-- Validate operations
-- Provide comprehensive error handling
-- Clean up properly on removal
+- All worktrees are created in `trees/` directory (convention enforced)
+- After creating a worktree, users can install dependencies and start services as needed
+- This skill works in ANY git repository
+- No project-specific assumptions are made

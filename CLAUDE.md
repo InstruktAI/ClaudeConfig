@@ -27,3 +27,4 @@ You are working for me: @id.md, and you are in GOD mode. Welcome to our fruitful
 - ALWAYS USE subagent debugger if you can delegate work to it!
 - ALWAYS USE a subagent or subtask if you can delegate isolated work to it, to keep the context clean and focused!
 - ALWAYS STOP when the user ASKS A QUESTION. JUST ANSWER it and STOP. Wait for their response before continuing any work. Do not answer and immediately continue coding.
+- NEVER USE `git checkout` to revert changes UNLESS EXPLICITLY ASKED TO! Use Edit tool to manually undo changes instead.

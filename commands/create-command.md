@@ -1,6 +1,6 @@
 ---
 allowed-tools: Write, Edit, WebFetch, Task, mcp__firecrawl-mcp__firecrawl_scrape, Fetch
-description: Create a new prompt command
+description: Create a new command
 ---
 
 # MetaPrompt
@@ -14,8 +14,11 @@ HIGH_LEVEL_PROMPT: $ARGUMENTS
 ## Workflow
 
 - We're building a new prompt to satisfy the request detailed in the `High Level Prompt`.
-- Save the new prompt to `.claude/commands/<name_of_prompt>.md`
-  - The name of the prompt should make sense based on the `High Level Prompt`
+- Determine where to save the command:
+  - In `~/.claude/` → save globally
+  - Clearly project-specific → find/create `.claude/commands/`, save there
+  - Generic enough → ask user global or project-local
+  - Name should make sense based on the `High Level Prompt`
 - VERY IMPORTANT: The prompt should be in the `Specified Format`
   - Do not create any additional sections or headers that are not in the `Specified Format`
 - IMPORTANT: As you're working through the `Specified Format`, replace every block of `<some request>` with the request detailed within the braces.

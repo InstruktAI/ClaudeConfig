@@ -1,5 +1,5 @@
 ---
-name: GitHub Workflows
+name: GitHub Workflows for building and deploying to itsup
 description: Creates production-ready GitHub Actions workflows with Docker builds, deployment automation, and ARM64 optimization. Use when setting up CI/CD pipelines, implementing Docker builds, configuring deployment workflows, optimizing build caching, or debugging GitHub Actions issues. Triggers on mentions of workflows, GitHub Actions, CI/CD, Docker build, deployment, self-hosted runners, or workflow optimization.
 ---
 
@@ -33,7 +33,7 @@ env:
 jobs:
   build:
     timeout-minutes: 15
-    runs-on: [self-hosted, linux, ARM64]  # Or: ubuntu-latest
+    runs-on: [self-hosted, linux, ARM64] # Or: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +70,7 @@ jobs:
 ```
 
 2. **Configure cache directory** (self-hosted runners only):
+
    ```bash
    mkdir -p /var/lib/docker-cache
    chown runner:runner /var/lib/docker-cache
@@ -129,6 +130,7 @@ jobs:
 When build process needs credentials (e.g., database access for code generation):
 
 **In Dockerfile**:
+
 ```dockerfile
 RUN --mount=type=secret,id=POSTGRES_PASSWORD,required \
     POSTGRES_PASSWORD=$(cat /run/secrets/POSTGRES_PASSWORD) \
@@ -136,6 +138,7 @@ RUN --mount=type=secret,id=POSTGRES_PASSWORD,required \
 ```
 
 **In GitHub Actions**:
+
 ```yaml
 - name: Build and push
   uses: docker/build-push-action@v6
@@ -150,12 +153,14 @@ Secrets mounted with `--mount=type=secret` never persist in image layers.
 ### Cache Strategy
 
 **Self-hosted runners** (recommended):
+
 ```yaml
 cache-from: type=local,src=/var/lib/docker-cache
 cache-to: type=local,dest=/var/lib/docker-cache,mode=max
 ```
 
 **GitHub-hosted runners**:
+
 ```yaml
 cache-from: type=gha
 cache-to: type=gha,mode=max
@@ -166,11 +171,13 @@ cache-to: type=gha,mode=max
 ### Example 1: Setting Up Basic Build Workflow
 
 User request:
+
 ```
 Set up GitHub Actions to build and push my Docker image on every push to main
 ```
 
 You would:
+
 1. Create `.github/workflows/build.yaml` in the repository
 2. Configure environment variables for registry and image name
 3. Add build job with:
@@ -184,11 +191,13 @@ You would:
 ### Example 2: Adding Deployment Workflow
 
 User request:
+
 ```
 Add deployment that triggers when the build completes successfully
 ```
 
 You would:
+
 1. Create `.github/workflows/deploy.yml` triggered by `workflow_run` event
 2. Add condition to only run if build workflow succeeded
 3. Configure deployment step with:
@@ -201,11 +210,13 @@ You would:
 ### Example 3: Optimizing Build Cache for Self-Hosted Runner
 
 User request:
+
 ```
 Our builds are taking 8 minutes on our Raspberry Pi runner, how can we speed them up?
 ```
 
 You would:
+
 1. Verify current build configuration lacks caching
 2. Add local disk cache configuration:
    ```yaml
@@ -223,11 +234,13 @@ You would:
 ### Example 4: Securing Build-Time Secrets
 
 User request:
+
 ```
 My Next.js app needs database credentials during build. How do I pass them securely?
 ```
 
 You would:
+
 1. Verify Dockerfile uses `--mount=type=secret` pattern (correct approach)
 2. Configure GitHub Actions workflow to pass secrets:
    ```yaml

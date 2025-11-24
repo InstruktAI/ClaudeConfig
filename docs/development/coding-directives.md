@@ -100,8 +100,20 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 1. Conform to existing naming and formatting automatically.
 2. Output only the required files or blocks; no commentary.
-3. Don’t add unused imports or extra utilities.
-4. Never contradict the project’s configuration.
+3. Don't add unused imports or extra utilities.
+4. Never contradict the project's configuration.
+
+## 11. Git Commits
+
+1. Format: `type(scope): subject` (commitizen style)
+   - Types: feat, fix, refactor, style, docs, test, chore, perf
+   - Subject: imperative mood, lowercase, no period, max 72 chars
+2. Always include attribution footer:
+   ```
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+   Co-Authored-By: Claude <noreply@anthropic.com>
+   ```
 
 ## Final Self-Check Before Emitting Code
 
