@@ -16,6 +16,7 @@ from utils.tts_manager import speak
 
 def test_speak_respects_service_priority(monkeypatch):
     """Tries services in TTS_SERVICE order"""
+    monkeypatch.setenv("TTS_ENABLED", "true")
     monkeypatch.setenv("TTS_SERVICE", "macos,openai")
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
 
@@ -32,6 +33,7 @@ def test_speak_respects_service_priority(monkeypatch):
 
 def test_speak_passes_text_to_subprocess(monkeypatch):
     """Passes text as argument to TTS script"""
+    monkeypatch.setenv("TTS_ENABLED", "true")
     monkeypatch.setenv("TTS_SERVICE", "macos")
 
     with patch("subprocess.Popen") as mock_popen:

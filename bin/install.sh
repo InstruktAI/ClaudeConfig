@@ -10,6 +10,18 @@ echo ""
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# Portable sed in-place editing function
+# Works on both macOS and Linux
+sed_inplace() {
+  local pattern="$1"
+  local file="$2"
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "$pattern" "$file"
+  else
+    sed -i "$pattern" "$file"
+  fi
+}
+
 # Check if .env exists and is complete
 ENV_COMPLETE=false
 if [ -f .env ]; then
@@ -36,8 +48,8 @@ if [ "$ENV_COMPLETE" = false ]; then
   read -p "Your email: " ENGINEER_EMAIL
 
   # Update .env
-  sed -i '' "s/^ENGINEER_NAME=.*/ENGINEER_NAME=$ENGINEER_NAME/" .env
-  sed -i '' "s/^ENGINEER_EMAIL=.*/ENGINEER_EMAIL=$ENGINEER_EMAIL/" .env
+  sed_inplace "s/^ENGINEER_NAME=.*/ENGINEER_NAME=$ENGINEER_NAME/" .env
+  sed_inplace "s/^ENGINEER_EMAIL=.*/ENGINEER_EMAIL=$ENGINEER_EMAIL/" .env
 
   echo ""
   echo "  ✓ Engineer details saved"
@@ -49,31 +61,31 @@ if [ "$ENV_COMPLETE" = false ]; then
 
   read -p "OpenAI API key (optional, for TTS and LLM): " OPENAI_KEY
   if [ -n "$OPENAI_KEY" ]; then
-    sed -i '' "s/^OPENAI_API_KEY=.*/OPENAI_API_KEY=$OPENAI_KEY/" .env
+    sed_inplace "s/^OPENAI_API_KEY=.*/OPENAI_API_KEY=$OPENAI_KEY/" .env
     echo "  ✓ OpenAI key saved"
   fi
 
   read -p "ElevenLabs API key (optional, for TTS): " ELEVENLABS_KEY
   if [ -n "$ELEVENLABS_KEY" ]; then
-    sed -i '' "s/^ELEVENLABS_API_KEY=.*/ELEVENLABS_API_KEY=$ELEVENLABS_KEY/" .env
+    sed_inplace "s/^ELEVENLABS_API_KEY=.*/ELEVENLABS_API_KEY=$ELEVENLABS_KEY/" .env
     echo "  ✓ ElevenLabs key saved"
   fi
 
   read -p "Anthropic API key (optional, for LLM): " ANTHROPIC_KEY
   if [ -n "$ANTHROPIC_KEY" ]; then
-    sed -i '' "s/^ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$ANTHROPIC_KEY/" .env
+    sed_inplace "s/^ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$ANTHROPIC_KEY/" .env
     echo "  ✓ Anthropic key saved"
   fi
 
   read -p "Limitless API key (optional, for Limitless MCP server): " LIMITLESS_KEY
   if [ -n "$LIMITLESS_KEY" ]; then
-    sed -i '' "s/^LIMITLESS_API_KEY=.*/LIMITLESS_API_KEY=$LIMITLESS_KEY/" .env
+    sed_inplace "s/^LIMITLESS_API_KEY=.*/LIMITLESS_API_KEY=$LIMITLESS_KEY/" .env
     echo "  ✓ Limitless key saved"
   fi
 
   read -p "Firecrawl API key (optional, for Firecrawl MCP server): " FIRECRAWL_KEY
   if [ -n "$FIRECRAWL_KEY" ]; then
-    sed -i '' "s/^FIRECRAWL_API_KEY=.*/FIRECRAWL_API_KEY=$FIRECRAWL_KEY/" .env
+    sed_inplace "s/^FIRECRAWL_API_KEY=.*/FIRECRAWL_API_KEY=$FIRECRAWL_KEY/" .env
     echo "  ✓ Firecrawl key saved"
   fi
 
@@ -126,6 +138,28 @@ else
   else
     echo "  ⊘ Keeping existing ccstatusline configuration"
   fi
+  echo ""
+fi
+
+# Install uv (Python package manager)
+if command -v uv &> /dev/null; then
+  echo "→ uv already installed ($(uv --version))"
+  echo ""
+else
+  echo "→ Installing uv (Python package manager)..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  echo "  ✓ uv installed"
+  echo ""
+fi
+
+# Install bun (JavaScript runtime)
+if command -v bun &> /dev/null; then
+  echo "→ bun already installed ($(bun --version))"
+  echo ""
+else
+  echo "→ Installing bun (JavaScript runtime)..."
+  curl -fsSL https://bun.com/install | bash
+  echo "  ✓ bun installed"
   echo ""
 fi
 
