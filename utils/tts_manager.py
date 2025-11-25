@@ -63,11 +63,6 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
 
     Example: TTS_SERVICE=openai,macos,pyttsx3
     """
-    # Check if TTS is globally disabled
-    if os.getenv("TTS_ENABLED", "false").lower() in ("false", "0", "no", "off"):
-        log.debug("TTS globally disabled (TTS_ENABLED=false)", hook_name, session_id)
-        return False
-
     tts_dir = os.path.expanduser("~/.claude/utils/tts")
 
     service_priority = os.getenv("TTS_SERVICE", "macos")
