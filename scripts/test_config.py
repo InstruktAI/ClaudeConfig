@@ -45,15 +45,19 @@ def print_result(name: str, passed: bool, message: str = ""):
     print(msg)
 
 
-def test_hook(hook_name: str, input_data: dict, project_root: Path) -> bool:
-    """Test a hook by calling it with sample data."""
-    hook_file = project_root / "hooks" / f"{hook_name}.py"
-    if not hook_file.exists():
+def test_hook(event_type: str, input_data: dict, project_root: Path) -> bool:
+    """Test a hook by calling the unified TTS hook with sample data."""
+    tts_hook = project_root / "hooks" / "tts.py"
+    if not tts_hook.exists():
         return False
+
+    # Skip if TTS is not enabled
+    if os.getenv("TTS_ENABLED", "false").lower() != "true":
+        return True
 
     try:
         result = subprocess.run(
-            [str(hook_file)],
+            [str(tts_hook), "--event-type", event_type],
             input=json.dumps(input_data),
             capture_output=True,
             text=True,
@@ -114,58 +118,58 @@ def main() -> int:
 
     # SessionStart
     passed = test_hook(
-        "session_start",
+        "SessionStart",
         {"session_id": "test-config", "source": "startup"},
         project_root,
     )
     hooks_tested += 1
     if passed:
         hooks_passed += 1
-    print_result(MESSAGES["session_start"], passed, "Hook executed")
+    print_result(MESSAGES["session_start"], passed, "Hook configured")
 
     # SessionEnd
     passed = test_hook(
-        "session_end",
+        "SessionEnd",
         {"session_id": "test-config", "reason": "test"},
         project_root,
     )
     hooks_tested += 1
     if passed:
         hooks_passed += 1
-    print_result(MESSAGES["session_end"], passed, "Hook executed")
+    print_result(MESSAGES["session_end"], passed, "Hook configured")
 
     # Stop
     passed = test_hook(
-        "stop",
+        "Stop",
         {"session_id": "test-config", "transcript_path": None},
         project_root,
     )
     hooks_tested += 1
     if passed:
         hooks_passed += 1
-    print_result(MESSAGES["stop"], passed, "Hook executed")
+    print_result(MESSAGES["stop"], passed, "Hook configured")
 
     # SubagentStop
     passed = test_hook(
-        "subagent_stop",
+        "SubagentStop",
         {"session_id": "test-config"},
         project_root,
     )
     hooks_tested += 1
     if passed:
         hooks_passed += 1
-    print_result(MESSAGES["subagent_stop"], passed, "Hook executed")
+    print_result(MESSAGES["subagent_stop"], passed, "Hook configured")
 
     # Notification
     passed = test_hook(
-        "notification",
+        "Notification",
         {"session_id": "test-config", "message": "Test"},
         project_root,
     )
     hooks_tested += 1
     if passed:
         hooks_passed += 1
-    print_result(MESSAGES["notification"], passed, "Hook executed")
+    print_result(MESSAGES["notification"], passed, "Hook configured")
 
     # Summary
     print()

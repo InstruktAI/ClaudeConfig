@@ -1,4 +1,4 @@
-#!/Users/Morriz/.claude/.venv/bin/python
+#!/usr/bin/env python3
 
 """
 Multi-Agent Observability Hook Script

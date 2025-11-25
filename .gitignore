@@ -48,3 +48,4 @@ id.md
 uv.lock
 plugins/
 todos/
+.credentials.json
