@@ -158,8 +158,23 @@ if command -v bun &> /dev/null; then
   echo ""
 else
   echo "→ Installing bun (JavaScript runtime)..."
-  curl -fsSL https://bun.com/install | bash
+  curl -fsSL https://bun.sh/install | bash
   echo "  ✓ bun installed"
+  echo ""
+fi
+
+# Install jq (JSON processor)
+if command -v jq &> /dev/null; then
+  echo "→ jq already installed ($(jq --version))"
+  echo ""
+else
+  echo "→ Installing jq (JSON processor)..."
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install jq
+  else
+    sudo apt-get update -qq && sudo apt-get install -y jq
+  fi
+  echo "  ✓ jq installed"
   echo ""
 fi
 
