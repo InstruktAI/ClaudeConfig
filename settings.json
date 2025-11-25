@@ -109,7 +109,7 @@
     "hookify@claude-code-plugins": true,
     "plugin-dev@claude-code-plugins": true
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754048693214
   }
