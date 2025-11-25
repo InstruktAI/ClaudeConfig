@@ -162,11 +162,8 @@ When TTS is skipped, a debug log entry is recorded instead.
 ├── bin/
 │   └── install.sh           # Interactive installation wizard
 ├── hooks/                   # Claude Code event hooks
-│   ├── session_start.py     # Session start with TTS
-│   ├── session_end.py       # Session end with stats
-│   ├── stop.py              # Task completion with LLM
-│   ├── subagent_stop.py     # Subagent completion
-│   └── notification.py      # Custom notifications
+│   ├── tts.py               # Unified TTS hook (--event-type flag)
+│   └── send_event.py        # Event dispatch to observability server
 ├── utils/                   # Shared utilities
 │   ├── tts/                 # TTS service implementations
 │   ├── llm/                 # LLM service implementations
