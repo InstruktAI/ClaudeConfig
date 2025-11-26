@@ -1,11 +1,11 @@
 ---
 name: astro-webapp
-description: Modern web app and static site creation with Astro, TypeScript, and Tailwind CSS. Use when users want to create fast, content-focused websites, landing pages, marketing sites, portfolios, or simple web apps with forms and interactivity. Covers project setup, component creation, styling, form handling, deployment with docker compose, or to Netlify/Vercel, and integration with services like Web3Forms for contact forms or Cal.com for booking.
+description: Modern web app and static site creation with Astro, TypeScript, and Tailwind CSS. Supports multi-language sites with type-safe i18n, clean component architecture, SEO optimization, and modern styling. Use when users want to create fast, content-focused websites, landing pages, marketing sites, portfolios, or multi-language web apps with forms and interactivity. Covers project setup, i18n configuration, component creation, styling, form handling, deployment, and integration with services like Web3Forms.
 ---
 
 # Astro Web App Builder
 
-Build modern, fast web applications and static sites using Astro with TypeScript and Tailwind CSS.
+Build modern, fast web applications and static sites using Astro with TypeScript and Tailwind CSS. Includes comprehensive multi-language support with type-safe i18n architecture.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ Build modern, fast web applications and static sites using Astro with TypeScript
 Use the initialization script for instant setup:
 
 ```bash
-python scripts/init_astro_project.py my-website --features "contact-form,tailwind"
+python scripts/init_astro_project.py my-website --features "contact-form,tailwind,i18n"
 ```
 
 Or manually:
@@ -25,20 +25,323 @@ cd my-website
 npx astro add tailwind
 ```
 
+### Tailwind CSS 4.x Setup (Modern)
+
+For latest Tailwind v4 with Vite plugin:
+
+```bash
+npm install -D @tailwindcss/vite@next tailwindcss@next
+```
+
+Update `astro.config.mjs`:
+
+```javascript
+import { defineConfig } from 'astro/config'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  vite: {
+    plugins: [tailwindcss()],
+  },
+})
+```
+
 ## Core Workflow
 
 ### 1. Project Structure
 
 ```
 src/
-├── components/     # Reusable components (.astro, .tsx)
-├── layouts/        # Page layouts
-├── pages/          # File-based routing
-├── styles/         # Global styles
-└── content/        # Markdown/MDX content (optional)
+├── components/
+│   ├── pages/           # Page-specific components (HomePage.astro, etc.)
+│   ├── LanguageSelector.astro  # For multi-language sites
+│   └── ThemeToggle.astro
+├── i18n/                # Multi-language support (optional)
+│   ├── utils.ts         # i18n utilities & type definitions
+│   ├── en.json          # English translations
+│   ├── es.json          # Spanish translations
+│   └── pages/           # Page-specific translations
+│       ├── about.json
+│       └── contact.json
+├── layouts/
+│   ├── MainLayout.astro
+│   └── LegalLayout.astro
+├── pages/
+│   ├── index.astro      # Default locale homepage
+│   ├── about.astro      # Default locale pages
+│   ├── [section].astro  # Dynamic routes (optional)
+│   └── es/              # Additional locale directories (if using i18n)
+│       ├── index.astro
+│       └── about.astro
+├── styles/
+│   └── index.css
+└── content/             # Markdown/MDX content (optional)
 ```
 
-### 2. Component Creation
+### 2. Multi-Language & Internationalization (i18n)
+
+#### Astro i18n Configuration
+
+Add i18n configuration to `astro.config.mjs`:
+
+```javascript
+import { defineConfig } from 'astro/config'
+
+export default defineConfig({
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'es', 'fr'],
+    routing: {
+      prefixDefaultLocale: false, // en at /, es at /es/, fr at /fr/
+    },
+  },
+})
+```
+
+#### i18n Utilities
+
+Type-safe translation and routing utilities provide:
+
+- `getTranslations(locale)` - Load translations for a locale
+- `t(locale, key)` - Translate nested keys with dot notation
+- `getLocalePath(sectionId, locale)` - Generate localized URLs
+- `parseCurrentPath(pathname)` - Extract locale and section from URL
+- `getTargetLocalePath(pathname)` - Get alternate language URL (for language switcher)
+- `enToEsSlug`, `esToEnSlug` - Slug mapping between locales
+
+**Full implementation:** Copy `assets/templates/i18n/utils.ts` to `src/i18n/utils.ts`
+
+#### Translation Files
+
+Organize translations with nested structure:
+- `meta`: Page titles and SEO descriptions
+- `nav`: Navigation labels
+- `hero`: Hero section content
+- `footer`: Footer text and links
+
+**Template files:** `assets/templates/i18n/{en,es}.json` - copy and customize for your content
+
+**Page-specific translations:** For complex pages, create `src/i18n/pages/{page}.json` with locale-keyed content. See `assets/templates/i18n/pages/about.json` for example structure.
+
+#### Clean Page Component Pattern
+
+**Route files are minimal** - they only define the locale:
+
+**`src/pages/index.astro`** (English, default locale):
+
+```astro
+---
+import HomePage from '../components/pages/HomePage.astro'
+const locale = 'en'
+---
+<HomePage locale={locale} />
+```
+
+**`src/pages/es/index.astro`** (Spanish):
+
+```astro
+---
+import HomePage from '../../components/pages/HomePage.astro'
+const locale = 'es'
+---
+<HomePage locale={locale} />
+```
+
+**Page component handles rendering** (`src/components/pages/HomePage.astro`):
+
+```astro
+---
+import { getTranslations, getLocalePath, type Locale } from '../../i18n/utils'
+import LanguageSelector from '../LanguageSelector.astro'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const trans = getTranslations(locale)
+const l = (id: string) => getLocalePath(id, locale)
+---
+
+<!doctype html>
+<html lang={locale}>
+<head>
+  <meta charset="UTF-8" />
+  <title>{trans.meta.title}</title>
+  <meta name="description" content={trans.meta.description} />
+
+  <!-- Hreflang for SEO -->
+  <link rel="alternate" hreflang="en" href="https://example.com/" />
+  <link rel="alternate" hreflang="es" href="https://example.com/es/" />
+  <link rel="alternate" hreflang="x-default" href="https://example.com/" />
+</head>
+<body>
+  <nav>
+    <a href={l('home')}>{trans.nav.home}</a>
+    <a href={l('about')}>{trans.nav.about}</a>
+    <a href={l('contact')}>{trans.nav.contact}</a>
+    <LanguageSelector locale={locale} />
+  </nav>
+
+  <main>
+    <h1>{trans.hero.title}</h1>
+    <p>{trans.hero.subtitle}</p>
+  </main>
+</body>
+</html>
+```
+
+#### Language Selector Component
+
+**`src/components/LanguageSelector.astro`**:
+
+```astro
+---
+import { getTargetLocalePath, type Locale } from '../i18n/utils'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const initialHref = getTargetLocalePath(locale === 'en' ? '/' : `/${locale}/`)
+---
+
+<a
+  class="language-selector"
+  href={initialHref}
+  aria-label="Switch language"
+>
+  <span>{locale}</span>
+</a>
+
+<script>
+  import { navigate } from 'astro:transitions/client'
+  import { getLocalePath, type Locale } from '../i18n/utils'
+
+  let currentSection = 'home'
+
+  function updateHref() {
+    const link = document.querySelector('.language-selector') as HTMLAnchorElement | null
+    if (!link) return
+    const locale = document.documentElement.lang as Locale
+    const targetLocale: Locale = locale === 'en' ? 'es' : 'en'
+    link.href = getLocalePath(currentSection, targetLocale)
+  }
+
+  function initLangSelector() {
+    const link = document.querySelector('.language-selector')
+    if (!link) return
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      navigate(link.href)
+    })
+
+    // Update when section changes
+    window.addEventListener('sectionchange', (e: CustomEvent) => {
+      currentSection = e.detail
+      updateHref()
+    })
+
+    updateHref()
+  }
+
+  initLangSelector()
+  document.addEventListener('astro:page-load', initLangSelector)
+</script>
+
+<style>
+  .language-selector {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+  }
+</style>
+```
+
+#### Language Auto-Detection
+
+Add to page component `<head>`:
+
+```html
+<script is:inline>
+  ;(function () {
+    try {
+      const storedLang = localStorage.getItem('language-preference')
+
+      if (!storedLang) {
+        const browserLang = navigator.language || navigator.userLanguage
+        const isSpanish = browserLang.startsWith('es')
+
+        if (isSpanish && window.location.pathname === '/') {
+          localStorage.setItem('language-preference', 'es')
+          window.location.href = '/es/'
+        } else {
+          localStorage.setItem('language-preference', 'en')
+        }
+      }
+    } catch (error) {
+      console.error('[i18n] Language detection failed:', error)
+    }
+  })()
+</script>
+```
+
+#### Dynamic Routes with getStaticPaths
+
+For section-based navigation (`/about`, `/contact`, etc.):
+
+**`src/pages/[section].astro`**:
+
+```astro
+---
+import HomePage from '../components/pages/HomePage.astro'
+import { enToEsSlug } from '../i18n/utils'
+
+export function getStaticPaths() {
+  return Object.keys(enToEsSlug).map(s => ({ params: { section: s } }))
+}
+
+const { section } = Astro.params
+---
+
+<HomePage locale="en" initialSection={section} />
+```
+
+**`src/pages/es/[section].astro`**:
+
+```astro
+---
+import HomePage from '../../components/pages/HomePage.astro'
+import { esToEnSlug } from '../../i18n/utils'
+
+export function getStaticPaths() {
+  return Object.keys(esToEnSlug).map(s => ({ params: { section: s } }))
+}
+
+const { section } = Astro.params
+const sectionId = esToEnSlug[section] || section
+---
+
+<HomePage locale="es" initialSection={sectionId} />
+```
+
+### 3. SEO Optimization for Multi-Language Sites
+
+Include in page `<head>`:
+- **Primary meta tags**: title, description, canonical URL, viewport
+- **Hreflang tags**: Critical for multi-language SEO (en, es, x-default)
+- **Open Graph**: og:* properties for social media sharing (Facebook, LinkedIn)
+- **Twitter cards**: twitter:* meta tags for Twitter/X previews
+- **Structured data (JSON-LD)**: Schema.org markup for search engines
+  - `WebSite` type for general pages
+  - `LocalBusiness` type for business info (address, phone, hours)
+
+**Template:** `assets/templates/SEO.astro` provides complete implementation with all meta tags and structured data patterns
+
+### 4. Component Creation
 
 **Astro Component (.astro)**:
 
@@ -67,7 +370,7 @@ const { title, variant = 'primary' } = Astro.props;
 </style>
 ```
 
-### 3. Form Handling
+### 5. Form Handling
 
 **Web3Forms Integration** (no backend needed):
 
@@ -115,7 +418,7 @@ const WEB3FORMS_KEY = import.meta.env.PUBLIC_WEB3FORMS_KEY;
 </form>
 ```
 
-### 4. Interactive Islands
+### 6. Interactive Islands
 
 Add React/Vue components only where needed:
 
@@ -150,7 +453,7 @@ import Counter from '../components/Counter.tsx';
 <Counter client:load />
 ```
 
-### 5. Content Collections
+### 7. Content Collections
 
 For blogs/documentation:
 
@@ -244,48 +547,6 @@ Use the template in `assets/templates/SEO.astro` for meta tags.
 ### Responsive Navigation
 
 Copy `assets/templates/Navigation.astro` for mobile-friendly nav.
-
-### Cal.com Integration
-
-```html
-<!-- Embed booking widget -->
-<div id="cal-embed"></div>
-<script>
-  (function (C, A, L) {
-    let p = function (a, ar) {
-      a.q.push(ar);
-    };
-    let d = C.document;
-    C.Cal =
-      C.Cal ||
-      function () {
-        let cal = C.Cal;
-        let ar = arguments;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement('script')).src = A;
-          cal.loaded = true;
-        }
-        if (ar[0] === L) {
-          const api = function () {
-            p(api, arguments);
-          };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          typeof namespace === 'string' ? (cal.ns[namespace] = api) && p(api, ar) : p(cal, ar);
-          return;
-        }
-        p(cal, ar);
-      };
-  })(window, 'https://app.cal.com/embed/embed.js', 'init');
-  Cal('init');
-  Cal('inline', {
-    elementOrSelector: '#cal-embed',
-    calLink: 'your-cal-username/meeting',
-  });
-</script>
-```
 
 ## DRY Principles & Component Extraction
 
