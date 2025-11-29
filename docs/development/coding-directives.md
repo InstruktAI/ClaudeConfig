@@ -8,6 +8,7 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 2. Use only approved dependencies, import patterns, naming, and formatting.
 3. Mirror the repository's structure and conventions.
 4. Don't introduce new frameworks or architectural patterns.
+5. **When debugging log files**: Truncate log files before operations to easily find relevant output (e.g., `: > /var/log/app.log`).
 
 ## 1. Architecture & Structure
 
@@ -105,15 +106,50 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 ## 11. Git Commits
 
-1. Format: `type(scope): subject` (commitizen style)
+**Git is version control, not a backup tool. Commits must be atomic, complete, and working.**
+
+1. **Format**: `type(scope): subject` (commitizen)
    - Types: feat, fix, refactor, style, docs, test, chore, perf
-   - Subject: imperative mood, lowercase, no period, max 72 chars
-2. Always include attribution footer:
+   - Subject: imperative, lowercase, no period, max 72 chars
+2. **Attribution footer**:
    ```
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
    Co-Authored-By: Claude <noreply@anthropic.com>
    ```
+
+### Commit Standards
+
+**Atomic commits (Unix philosophy): Do ONE thing completely and well.**
+
+- ✅ "feat(auth): add JWT validation" - complete feature
+- ✅ "fix(api): handle null response" - one bug
+- ❌ "fix bugs and add features" - not atomic
+- ❌ "WIP" or "quick save" - not complete
+
+**Pre-commit hooks enforce tests/linting/formatting automatically.**
+
+Only commit when:
+- Change is atomic and complete
+- Code works (hooks will verify)
+- No debug/temp code
+
+Use rsync or git stash for WIP, not commits.
+
+## 12. Logging & Observability
+
+1. Add logging at key execution points: boundaries, state changes, errors.
+2. Use appropriate log levels:
+   - DEBUG: detailed diagnostic info for troubleshooting
+   - INFO: significant events (startup, config loaded, operation completed)
+   - WARNING: recoverable issues, degraded behavior
+   - ERROR: failures requiring attention
+   - CRITICAL: system-threatening failures
+3. Log input validation failures and all error paths.
+4. Include relevant context (IDs, paths, values) in messages for traceability.
+5. **When debugging**: Truncate log files before operations to isolate relevant output (e.g., `: > /var/log/app.log`).
+6. Never log sensitive data (passwords, tokens, PII, API keys).
+7. Use single-line text format; formatters are already configured. **Never use JSON logging**.
 
 ## Final Self-Check Before Emitting Code
 
@@ -123,4 +159,5 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 -   [ ] No extra abstractions or side effects
 -   [ ] Dependencies explicit, not hidden
 -   [ ] Fail-fast logic present
+-   [ ] Logging added at key points with appropriate levels
 -   [ ] Simple, short, and testable

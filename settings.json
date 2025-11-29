@@ -5,6 +5,7 @@
     "allow": [],
     "deny": []
   },
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -58,6 +59,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app cc-hook-multi-agent-obvs --event-type Stop --add-chat"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/stop.sh"
           }
         ]
       }
