@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {},
+  "env": { },
   "permissions": {
-    "allow": [],
-    "deny": []
+    "allow": [ ],
+    "deny": [ ]
   },
   "model": "sonnet",
   "hooks": {
@@ -62,7 +62,7 @@
           },
           {
             "type": "command",
-            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/stop.sh"
+            "command": "$HOME/.claude/hooks/stop.sh"
           }
         ]
       }
