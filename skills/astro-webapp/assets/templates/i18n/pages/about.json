@@ -1,0 +1,48 @@
+{
+  "en": {
+    "title": "About Our Company",
+    "subtitle": "Our story and mission",
+    "sections": {
+      "history": {
+        "title": "Our History",
+        "content": "Founded in 2010, we've been serving our community for over a decade..."
+      },
+      "mission": {
+        "title": "Our Mission",
+        "content": "We strive to provide exceptional service and create lasting value for our clients..."
+      },
+      "values": {
+        "title": "Our Values",
+        "items": [
+          "Integrity in all we do",
+          "Excellence in service delivery",
+          "Innovation and continuous improvement",
+          "Respect for our clients and team"
+        ]
+      }
+    }
+  },
+  "es": {
+    "title": "Acerca de Nuestra Empresa",
+    "subtitle": "Nuestra historia y misión",
+    "sections": {
+      "history": {
+        "title": "Nuestra Historia",
+        "content": "Fundada en 2010, hemos estado sirviendo a nuestra comunidad por más de una década..."
+      },
+      "mission": {
+        "title": "Nuestra Misión",
+        "content": "Nos esforzamos por proporcionar un servicio excepcional y crear valor duradero para nuestros clientes..."
+      },
+      "values": {
+        "title": "Nuestros Valores",
+        "items": [
+          "Integridad en todo lo que hacemos",
+          "Excelencia en la entrega de servicios",
+          "Innovación y mejora continua",
+          "Respeto por nuestros clientes y equipo"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,156 @@
+---
+// Page Component - handles all rendering
+// Copy to: src/components/pages/HomePage.astro
+
+import { ClientRouter } from 'astro:transitions'
+import { getTranslations, getLocalePath, type Locale } from '../../i18n/utils'
+import LanguageSelector from '../LanguageSelector.astro'
+import Footer from '../Footer.astro'
+
+interface Props {
+  locale: Locale
+  initialSection?: string
+}
+
+const { locale, initialSection } = Astro.props
+const trans = getTranslations(locale)
+const siteUrl = 'https://example.com' // Replace with your site URL
+const baseUrl = locale === 'en' ? siteUrl : `${siteUrl}/${locale}`
+const ogImage = `${siteUrl}/og-image.jpg`
+
+// Helper function for localized paths
+const l = (id: string) => getLocalePath(id, locale)
+---
+
+<!doctype html>
+<html lang={locale} transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{trans.meta.title}</title>
+    <meta name="description" content={trans.meta.description} />
+    <link rel="canonical" href={baseUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Hreflang tags for SEO -->
+    <link rel="alternate" hreflang="en" href={siteUrl} />
+    <link rel="alternate" hreflang="es" href={`${siteUrl}/es`} />
+    <link rel="alternate" hreflang="x-default" href={siteUrl} />
+
+    <!-- Language auto-detection (first visit only) -->
+    <script is:inline>
+      ;(function () {
+        try {
+          const STORAGE_KEY = 'language-preference'
+          const storedLang = localStorage.getItem(STORAGE_KEY)
+
+          if (!storedLang) {
+            const browserLang = navigator.language || navigator.userLanguage
+            const isSpanish = browserLang.startsWith('es')
+
+            if (isSpanish) {
+              localStorage.setItem(STORAGE_KEY, 'es')
+              window.location.href = '/es/'
+            } else {
+              localStorage.setItem(STORAGE_KEY, 'en')
+            }
+          }
+        } catch (error) {
+          console.error('[i18n] Language detection failed:', error)
+        }
+      })()
+    </script>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={baseUrl} />
+    <meta property="og:title" content={trans.meta.title} />
+    <meta property="og:description" content={trans.meta.description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={locale === 'en' ? 'en_US' : 'es_ES'} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={baseUrl} />
+    <meta name="twitter:title" content={trans.meta.title} />
+    <meta name="twitter:description" content={trans.meta.description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-container">
+        <a href={l('home')} class="nav-logo" data-section="home">
+          <span>{trans.nav.logo}</span>
+        </a>
+        <ul class="nav-menu">
+          <li><a href={l('about')} data-section="about">{trans.nav.about}</a></li>
+          <li><a href={l('services')} data-section="services">{trans.nav.services}</a></li>
+          <li><a href={l('contact')} data-section="contact">{trans.nav.contact}</a></li>
+          <li class="language-selector-wrapper">
+            <LanguageSelector locale={locale} />
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main>
+      <section id="home" class="hero">
+        <div class="hero-content">
+          <h1>{trans.hero.title}</h1>
+          <p>{trans.hero.subtitle}</p>
+          <div class="hero-cta">
+            <a href={l('contact')} data-section="contact" class="btn-primary">
+              {trans.hero.ctaPrimary}
+            </a>
+            <a href={l('about')} data-section="about" class="btn-secondary">
+              {trans.hero.ctaSecondary}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add more sections here -->
+    </main>
+
+    <Footer locale={locale} />
+
+    <script is:inline define:vars={{ initialSection }}>
+      // Store config for view transitions
+      window.__pageConfig = { initialSection }
+
+      function initHomePage() {
+        // Handle initial section scroll (from dynamic routes)
+        if (initialSection && initialSection !== 'home') {
+          requestAnimationFrame(() => {
+            const targetElement = document.getElementById(initialSection)
+            if (targetElement) {
+              const targetPosition = targetElement.offsetTop - 80
+              window.scrollTo(0, targetPosition)
+            }
+          })
+        }
+
+        // Section links: scroll only, don't trigger View Transition
+        document.querySelectorAll('a[data-section]').forEach((anchor) => {
+          anchor.addEventListener('click', (e) => {
+            const sectionId = anchor.getAttribute('data-section')
+            const targetElement = document.getElementById(sectionId)
+            if (targetElement) {
+              e.preventDefault()
+              const targetPosition = targetElement.offsetTop - 80
+              window.scrollTo({ top: targetPosition, behavior: 'smooth' })
+              window.dispatchEvent(new CustomEvent('sectionchange', { detail: sectionId }))
+            }
+          })
+        })
+      }
+
+      initHomePage()
+      document.addEventListener('astro:page-load', () => {
+        if (window.__pageConfig) initHomePage()
+      })
+    </script>
+  </body>
+</html>

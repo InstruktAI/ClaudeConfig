@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "title": "My Website - Professional Services",
+    "description": "High-quality professional services tailored to your needs",
+    "ogImageAlt": "My Website Logo"
+  },
+  "nav": {
+    "logo": "My Brand",
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Welcome to Our Services",
+    "subtitle": "Professional Excellence You Can Trust",
+    "ctaPrimary": "Get Started",
+    "ctaSecondary": "Learn More"
+  },
+  "sections": {
+    "about": {
+      "title": "About Us",
+      "intro": "We provide exceptional services...",
+      "mission": "Our mission is to deliver quality..."
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive solutions for your needs"
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "subtitle": "We'd love to hear from you",
+      "form": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "message": "Message",
+        "submit": "Send Message",
+        "required": "*"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 My Website. All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us"
+  },
+  "legal": {
+    "backLink": "← Back to homepage"
+  }
+}

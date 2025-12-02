@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 """
-TTS Queue Runner - ensures sequential FIFO TTS playback.
+TTS Queue Runner - ensures sequential FIFO TTS playback with fallback.
 Uses exclusive file locking to ensure only one TTS plays at a time.
+Supports fallback chain: tries each TTS service until one succeeds.
 """
 
 import fcntl
@@ -11,46 +12,65 @@ import subprocess
 import sys
 import time
 
+from utils.logging_helper import log
 
-def run_tts_with_lock(text: str, script_path: str, lock_file: str) -> int:
+
+def run_tts_script(text: str, script_path: str) -> bool:
+    """Run a single TTS script, return True if successful."""
+    python_path = os.path.expanduser("~/.claude/.venv/bin/python")
+    result = subprocess.run([python_path, script_path, text], check=False, capture_output=True)
+    return result.returncode == 0
+
+
+def run_tts_with_lock(text: str, script_paths: list[str], lock_file: str) -> int:
     """
-    Run TTS script while holding exclusive lock.
-    This ensures only one TTS plays at a time, regardless of queue state.
+    Run TTS scripts with fallback while holding exclusive lock.
+    Tries each script in order until one succeeds.
     """
     try:
-        # Acquire exclusive lock - blocks until available
         with open(lock_file, "a") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
 
-            # Now we have exclusive access - run TTS
-            python_path = os.path.expanduser("~/.claude/.venv/bin/python")
-            result = subprocess.run([python_path, script_path, text], check=False)
+            for script_path in script_paths:
+                service_name = os.path.basename(script_path).replace("_tts.py", "").replace("_simple", "")
+                log.debug(f"Trying TTS: {service_name}", "tts_queue_runner")
 
-            # Small delay to ensure audio device is released
-            time.sleep(0.5)
+                if run_tts_script(text, script_path):
+                    log.debug(f"TTS succeeded: {service_name}", "tts_queue_runner")
+                    time.sleep(0.5)
+                    return 0
 
-            # Lock automatically released when context exits
-            return result.returncode
-    except Exception:
+                log.debug(f"TTS failed: {service_name}, trying next...", "tts_queue_runner")
+
+            log.error("All TTS services failed", "tts_queue_runner")
+            return 1
+    except Exception as e:
+        log.error(f"TTS lock error: {e}", "tts_queue_runner")
         return 1
 
 
 def main():
+    # Usage: tts_queue_runner.py <script1> [script2] ... -- <text> <job_id>
     if len(sys.argv) < 4:
         sys.exit(1)
 
-    script_path = sys.argv[1]
-    text = sys.argv[2]
-    job_id = sys.argv[3]
+    # Parse args: scripts before --, text and job_id after
+    if "--" in sys.argv:
+        separator_idx = sys.argv.index("--")
+        script_paths = sys.argv[1:separator_idx]
+        text = sys.argv[separator_idx + 1]
+        # job_id = sys.argv[separator_idx + 2]  # unused but kept for compatibility
+    else:
+        # Legacy single-script mode for backwards compatibility
+        script_paths = [sys.argv[1]]
+        text = sys.argv[2]
+        # job_id = sys.argv[3]
 
     queue_dir = os.path.expanduser("~/.claude/.tmp/tts_queue")
     os.makedirs(queue_dir, exist_ok=True)
 
-    # Single playback lock ensures sequential execution
     playback_lock = os.path.join(queue_dir, ".playback.lock")
-
-    # Run TTS with exclusive lock - this blocks if another TTS is playing
-    exit_code = run_tts_with_lock(text, script_path, playback_lock)
+    exit_code = run_tts_with_lock(text, script_paths, playback_lock)
     sys.exit(exit_code)
 
 

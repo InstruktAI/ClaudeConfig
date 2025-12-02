@@ -1,0 +1,123 @@
+---
+// Language Selector Component
+// Copy to: src/components/LanguageSelector.astro
+// Provides client-side language switching with section awareness
+
+import { getTargetLocalePath, type Locale } from '../i18n/utils'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+// Initial href for SSR - will be computed dynamically on click
+const initialHref = getTargetLocalePath(locale === 'en' ? '/' : `/${locale}/`)
+---
+
+<a
+  class="language-selector"
+  href={initialHref}
+  aria-label="Switch language"
+  title="Switch language"
+>
+  <span class="language-code">{locale}</span>
+</a>
+
+<script>
+  import { navigate } from 'astro:transitions/client'
+  import { getLocalePath, type Locale } from '../i18n/utils'
+
+  let currentSection = 'home'
+
+  // Update href based on current section
+  function updateHref() {
+    const link = document.querySelector('.language-selector') as HTMLAnchorElement | null
+    if (!link) return
+    const locale = document.documentElement.lang as Locale
+    const targetLocale: Locale = locale === 'en' ? 'es' : 'en'
+    link.href = getLocalePath(currentSection, targetLocale)
+  }
+
+  function initLangSelector() {
+    const link = document.querySelector('.language-selector') as HTMLAnchorElement | null
+    if (!link) return
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      navigate(link.href)
+    })
+
+    // Update href and browser URL on section change (nav clicks)
+    window.addEventListener('sectionchange', (e: CustomEvent) => {
+      currentSection = e.detail
+      updateHref()
+      // Update browser URL to reflect current section
+      const locale = document.documentElement.lang as Locale
+      const url = getLocalePath(currentSection, locale)
+      history.pushState(null, '', url)
+    })
+
+    // Update href on initial load and back/forward navigation
+    updateHref()
+    window.addEventListener('popstate', updateHref)
+  }
+
+  // Sync localStorage on page load
+  function syncLocalStorage() {
+    const lang = document.documentElement.lang as Locale
+    try {
+      localStorage.setItem('language-preference', lang)
+    } catch (_) {}
+  }
+
+  initLangSelector()
+  syncLocalStorage()
+  document.addEventListener('astro:page-load', () => {
+    initLangSelector()
+    syncLocalStorage()
+  })
+</script>
+
+<style>
+  .language-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--primary, #3b82f6);
+    transition: all 0.3s ease;
+    box-shadow:
+      0 2px 8px color-mix(in srgb, var(--primary, #3b82f6) 20%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--primary, #3b82f6) 15%, transparent);
+    text-decoration: none;
+  }
+
+  .language-selector:hover {
+    background: color-mix(in srgb, var(--primary, #3b82f6) 10%, transparent);
+    box-shadow:
+      0 4px 12px color-mix(in srgb, var(--primary, #3b82f6) 25%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--primary, #3b82f6) 20%, transparent);
+  }
+
+  .language-code {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary, #3b82f6);
+    text-transform: lowercase;
+    letter-spacing: 0.5px;
+    user-select: none;
+  }
+
+  @media (max-width: 768px) {
+    .language-selector {
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>

@@ -2,7 +2,47 @@
 
 Purpose: Define testing standards and quality gates  not implementation details. Apply in every project unless configuration explicitly overrides.
 
-## 0. Pre-Commit Quality Gates
+## 0. Real-World Testing (Multi-Computer Systems)
+
+**CRITICAL: Automated tests alone are INSUFFICIENT. Real-world testing on actual target hardware is MANDATORY.**
+
+For multi-computer systems (TeleClaude, distributed services, embedded systems):
+
+### Development Workflow
+
+1. **Make changes locally** - write code, run targeted automated tests
+2. **Rsync to target computer(s)** - sync during development, not after:
+   ```bash
+   # Use shorthand from config.yml (e.g., raspi, raspi4)
+   bin/rsync.sh <computer-name>
+
+   # Then restart daemon on remote
+   ssh -A user@hostname 'cd $HOME/apps/TeleClaude && make restart'
+   ```
+3. **Real-world testing** - create TEST sessions to verify actual behavior:
+   - Use `teleclaude__start_session` with title: `"TEST: {what you're testing}"`
+   - Example: `"TEST: session lookup"` → generates channel: `$MozBook > $RasPi[apps/TeleClaude] - TEST: session lookup`
+   - Manually verify the feature works on real hardware
+4. **Only commit if real-world testing passes** - automated tests + real hardware verification
+5. **Deploy with `/deploy`** - after commit, use deployment command to roll out to all computers
+
+### Why This Matters
+
+- Automated tests verify logic in isolation
+- Real hardware reveals: timing issues, platform differences, network behavior, actual user experience
+- **If it doesn't work on real hardware, automated tests passing is meaningless**
+
+### TEST Session Naming Convention
+
+When creating sessions for testing (not production use):
+- **Always prefix with `TEST:`** to distinguish from production sessions
+- Be specific about what you're testing
+- Examples:
+  - `"TEST: voice transcription"`
+  - `"TEST: file upload to Claude"`
+  - `"TEST: session cleanup after tmux exit"`
+
+## 1. Pre-Commit Quality Gates
 
 1. **All tests MUST pass** before committing code.
 2. **All linting errors MUST be fixed** before committing code.
@@ -10,9 +50,59 @@ Purpose: Define testing standards and quality gates  not implementation details
 4. Never commit code with failing tests, lint violations, or type errors.
 5. If pre-commit hooks are configured, they MUST pass without warnings.
 
+### **CRITICAL: Run Targeted Tests, NOT Full Suite During Development**
+
+**NEVER waste time running the entire test suite when you know which specific tests are affected.**
+
+When fixing bugs or making changes:
+
+1. **Run ONLY the specific failing test(s)** - not the entire suite
+2. **Use test file/module paths** - `.venv/bin/pytest tests/unit/test_foo.py -v`
+3. **Run single test methods** - `.venv/bin/pytest tests/unit/test_foo.py::TestClass::test_method -v`
+
+**Examples:**
+
+```bash
+# ✅ CORRECT - targeted test after fixing file_handler.py
+.venv/bin/pytest tests/unit/test_file_handler.py -v
+
+# ✅ CORRECT - single failing test
+.venv/bin/pytest tests/integration/test_file_upload.py::TestFileUploadFlow::test_file_upload_without_claude_code -v
+
+# ❌ WRONG - running entire suite when you know which test failed
+make test  # DON'T do this during active debugging
+```
+
+**Running the full test suite when you know the specific failing test is wasteful and inefficient.**
+
+### **CRITICAL: Always Use Parallel Execution with Bash Timeout**
+
+**Every test invocation MUST include:**
+- `-n auto` for parallel execution (pytest-xdist)
+- **Bash tool timeout based on test type:**
+  - **Unit tests: 3000ms (3s)** - fast, parallel, should complete quickly
+  - **Integration tests: 15000ms (15s)** - slower, involve I/O and real systems
+
+**Examples:**
+```bash
+# ✅ CORRECT - unit tests with 3s timeout
+.venv/bin/pytest -n auto tests/unit/test_foo.py -v  # Use timeout=3000 in Bash tool
+
+# ✅ CORRECT - integration tests with 15s timeout
+.venv/bin/pytest -n auto tests/integration/test_file_upload.py -v  # Use timeout=15000 in Bash tool
+
+# ❌ WRONG - no parallel execution
+.venv/bin/pytest tests/unit/test_foo.py -v
+
+# ❌ WRONG - wrong timeout for test type
+.venv/bin/pytest -n auto tests/unit/test_foo.py -v  # Using timeout=15000 (too long!)
+```
+
+**NEVER waste time waiting for tests - always use `-n auto` and appropriate timeout (3s for unit, 15s for integration).**
+
 ## 1. Test Organization
 
-1. One test file per source module (e.g., `foo.py` � `test_foo.py`).
+1. One test file per source module (e.g., `foo.py` � `test_foo.py`).
 2. Group related tests in the same file.
 3. Use descriptive test function names that explain the expected behavior.
 4. Test files go in a dedicated `tests/` directory.
@@ -83,7 +173,7 @@ Purpose: Define testing standards and quality gates  not implementation details
 5. Type checking errors that MUST be resolved:
    - Missing return type annotations
    - Missing parameter type annotations
-   - Generic types without parameters (`dict` � `dict[str, Any]`)
+   - Generic types without parameters (`dict` � `dict[str, Any]`)
    - Use of `Any` without justification
    - Incompatible type assignments
 
@@ -127,6 +217,11 @@ Before committing code, verify:
 - [ ] Edge cases and error conditions tested
 - [ ] No commented-out code or tests
 - [ ] Pre-commit hooks pass without warnings
+- [ ] **Real-world testing complete** (multi-computer systems only):
+  - [ ] Code rsync'd to target computer(s)
+  - [ ] Daemon restarted on remote
+  - [ ] TEST session created and verified working
+  - [ ] Feature works on actual hardware
 
 ## Final Self-Check Before Committing
 

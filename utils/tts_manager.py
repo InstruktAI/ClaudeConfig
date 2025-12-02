@@ -61,7 +61,8 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
     - elevenlabs (premium quality, requires API key)
     - pyttsx3 (offline fallback)
 
-    Example: TTS_SERVICE=openai,macos,pyttsx3
+    Example: TTS_SERVICE=elevenlabs,macos,pyttsx3
+    Fallback happens in the queue runner if a service fails (e.g., quota exceeded).
     """
     tts_dir = os.path.expanduser("~/.claude/utils/tts")
 
@@ -77,6 +78,9 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
 
     log.debug(f"Speaking: {text} (priority: {service_priority})", hook_name, session_id)
 
+    # Build list of valid script paths for fallback chain
+    script_paths = []
+    service_labels = []
     for service in service_names:
         service_name, script_path = service_map.get(service, (None, None))
         if not service_name:
@@ -88,23 +92,26 @@ def speak(text: str, hook_name: str, session_id: Optional[str] = None, timeout: 
         if service == "elevenlabs" and not os.getenv("ELEVENLABS_API_KEY"):
             continue
 
-        try:
-            # Run TTS via queue runner to ensure sequential FIFO playback
-            python_path = os.path.expanduser("~/.claude/.venv/bin/python")
-            queue_runner = os.path.expanduser("~/.claude/utils/tts_queue_runner.py")
-            job_id = f"{time.time_ns()}"
-            log.debug(
-                f"Calling: {python_path} {queue_runner} {script_path} '{text[:50]}...' {job_id}", hook_name, session_id
-            )
-            result = subprocess.Popen(
-                [python_path, queue_runner, script_path, text, job_id],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            log.debug(f"TTS queued via {service_name} (pid: {result.pid})", hook_name, session_id)
-            return True
-        except Exception as e:
-            log.error(f"{service_name} error: {e}", hook_name, session_id, error=e)
+        if script_path and os.path.exists(script_path):
+            script_paths.append(script_path)
+            service_labels.append(service_name)
 
-    log.error("All TTS services failed", hook_name, session_id)
-    return False
+    if not script_paths:
+        log.error("No TTS services available", hook_name, session_id)
+        return False
+
+    try:
+        python_path = os.path.expanduser("~/.claude/.venv/bin/python")
+        queue_runner = os.path.expanduser("~/.claude/utils/tts_queue_runner.py")
+        job_id = f"{time.time_ns()}"
+
+        # Pass all scripts as fallback chain: script1 script2 ... -- text job_id
+        cmd = [python_path, queue_runner] + script_paths + ["--", text, job_id]
+        log.debug(f"TTS fallback chain: {', '.join(service_labels)}", hook_name, session_id)
+
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        log.debug(f"TTS queued (pid: {result.pid})", hook_name, session_id)
+        return True
+    except Exception as e:
+        log.error(f"TTS queue error: {e}", hook_name, session_id, error=e)
+        return False

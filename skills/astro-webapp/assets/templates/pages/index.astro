@@ -1,0 +1,11 @@
+---
+// Route page for default locale (English)
+// Copy to: src/pages/index.astro
+// Minimal - only defines locale, rendering is delegated to HomePage component
+
+import HomePage from '../components/pages/HomePage.astro'
+
+const locale = 'en'
+---
+
+<HomePage locale={locale} />

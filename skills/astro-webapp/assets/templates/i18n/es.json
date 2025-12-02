@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "title": "Mi Sitio Web - Servicios Profesionales",
+    "description": "Servicios profesionales de alta calidad adaptados a tus necesidades",
+    "ogImageAlt": "Logo de Mi Sitio Web"
+  },
+  "nav": {
+    "logo": "Mi Marca",
+    "home": "Inicio",
+    "about": "Acerca",
+    "services": "Servicios",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Bienvenido a Nuestros Servicios",
+    "subtitle": "Excelencia Profesional en la que Puedes Confiar",
+    "ctaPrimary": "Empezar",
+    "ctaSecondary": "Saber Más"
+  },
+  "sections": {
+    "about": {
+      "title": "Acerca de Nosotros",
+      "intro": "Ofrecemos servicios excepcionales...",
+      "mission": "Nuestra misión es entregar calidad..."
+    },
+    "services": {
+      "title": "Nuestros Servicios",
+      "subtitle": "Soluciones integrales para tus necesidades"
+    },
+    "contact": {
+      "title": "Ponte en Contacto",
+      "subtitle": "Nos encantaría saber de ti",
+      "form": {
+        "name": "Nombre",
+        "email": "Correo",
+        "phone": "Teléfono",
+        "message": "Mensaje",
+        "submit": "Enviar Mensaje",
+        "required": "*"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 Mi Sitio Web. Todos los derechos reservados.",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad",
+    "contact": "Contáctanos"
+  },
+  "legal": {
+    "backLink": "← Volver a la página principal"
+  }
+}
