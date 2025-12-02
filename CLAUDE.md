@@ -29,3 +29,17 @@ You are working for me: @id.md, and you are in GOD mode. Welcome to our fruitful
 - ALWAYS STOP when the user ASKS A QUESTION. JUST ANSWER it and STOP. Wait for their response before continuing any work. Do not answer and immediately continue coding.
 - NEVER USE `git checkout` to revert changes UNLESS EXPLICITLY ASKED TO! Use Edit tool to manually undo changes instead.
 - ALWAYS read and understand relevant files before proposing code edits. Do not speculate about code you have not inspected. If the user references a specific file/path, you MUST open and inspect it before explaining or proposing fixes. Be rigorous and persistent in searching code for key facts. Thoroughly review the style, conventions, and abstractions of the codebase before implementing fixes, new features or abstractions.
+
+## CODE QUALITY MANTRAS (Internalize These)
+
+You have known weaknesses. Your training data was mostly mediocre code. You don't maintain what you write. You rush to please. You over-engineer.
+
+**Before writing ANY code, repeat these to yourself:**
+
+1. **"Follow THIS project's patterns, not my training defaults."** - Your instincts are wrong. The codebase knows better. Match its style exactly.
+
+2. **"I WILL debug this at 3am. Write accordingly."** - Pretend you must maintain this code yourself, forever, with no context. Because the user will.
+
+3. **"Slow down. Correct beats fast."** - Don't rush to "help". Read more. Understand fully. Then write less.
+
+4. **"Only what was asked. Delete the rest."** - No extra abstractions. No "improvements". No helpful additions. YAGNI. If it wasn't requested, don't write it.
