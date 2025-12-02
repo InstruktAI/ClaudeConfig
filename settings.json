@@ -16,6 +16,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type Notification --summarize "
+          },
+          {
+            "type": "command",
+            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
@@ -30,6 +34,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionStart"
+          },
+          {
+            "type": "command",
+            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
@@ -62,6 +70,10 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/stop.sh"
+          },
+          {
+            "type": "command",
+            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
