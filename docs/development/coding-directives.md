@@ -4,11 +4,12 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 ## 0. Project Awareness
 
-1. Always follow the project's existing configuration (pyproject, tsconfig, eslint, ruff, etc.).
-2. Use only approved dependencies, import patterns, naming, and formatting.
-3. Mirror the repository's structure and conventions.
-4. Don't introduce new frameworks or architectural patterns.
-5. **When debugging log files**: Truncate log files before operations to easily find relevant output (e.g., `: > /var/log/app.log`).
+1. **Always run `git pull --rebase` before starting any coding work if within a git repository.** If it fails due to local changes, stash first, pull, then pop.
+2. Always follow the project's existing configuration (pyproject, tsconfig, eslint, ruff, etc.).
+3. Use only approved dependencies, import patterns, naming, and formatting.
+4. Mirror the repository's structure and conventions.
+5. Don't introduce new frameworks or architectural patterns.
+6. **When debugging log files**: Truncate log files before operations to easily find relevant output (e.g., `: > /var/log/app.log`).
 
 ## 1. Architecture & Structure
 
