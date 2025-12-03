@@ -119,6 +119,17 @@ else
   echo ""
 fi
 
+# Create voices.json from template if needed
+if [ ! -f config/voices.json ]; then
+  echo "→ Creating config/voices.json from template..."
+  cp config/voices.example.json config/voices.json
+  echo "  ✓ voices.json created (customize your voice preferences)"
+  echo ""
+else
+  echo "→ config/voices.json already exists (preserved)"
+  echo ""
+fi
+
 # Configure ccstatusline (Claude CLI status line)
 CCSTATUS_DIR="$HOME/.config/ccstatusline"
 CCSTATUS_FILE="$CCSTATUS_DIR/settings.json"
