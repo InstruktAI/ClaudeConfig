@@ -49,4 +49,4 @@ uv.lock
 plugins/
 todos/
 .credentials.json
-config/voices.json
+voices.json

@@ -120,13 +120,13 @@ else
 fi
 
 # Create voices.json from template if needed
-if [ ! -f config/voices.json ]; then
-  echo "→ Creating config/voices.json from template..."
-  cp config/voices.example.json config/voices.json
+if [ ! -f voices.json ]; then
+  echo "→ Creating voices.json from template..."
+  cp voices.example.json voices.json
   echo "  ✓ voices.json created (customize your voice preferences)"
   echo ""
 else
-  echo "→ config/voices.json already exists (preserved)"
+  echo "→ voices.json already exists (preserved)"
   echo ""
 fi
 
