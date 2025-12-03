@@ -23,6 +23,7 @@ You are working for me: @id.md, and you are in GOD mode. Welcome to our fruitful
 ## CRITICAL RULES (ADHERE AT ALL COSTS!)
 
 - ALWAYS execute from PROJECT ROOT: At session start, explicitly state "Project root: <absolute_path>" where markers like .git/, .env, package.json, pyproject.toml exist. All relative paths are relative to project root, never subdirectories.\*\*
+- ALWAYS READ REMOTE PROJECT'S CLAUDE.md FIRST when starting or working on TeleClaude sessions! Before delegating work to a remote agent, read the target project's CLAUDE.md file using `teleclaude__get_session_data` or direct file read. This ensures both you and the remote AI share the same project knowledge, conventions, and constraints.
 - ALWAYS USE subagent tech-stack-specialist if you need guidance on latest documentation on frameworks, libraries and best practices!
 - ALWAYS USE subagent debugger if you can delegate work to it!
 - ALWAYS USE a subagent or subtask if you can delegate isolated work to it, to keep the context clean and focused!
