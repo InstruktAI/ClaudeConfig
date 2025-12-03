@@ -1,0 +1,88 @@
+{
+  "voices": [
+    {
+      "name": "Rachel",
+      "elevenlabs_id": "21m00Tcm4TlvDq8ikWAM",
+      "macos_voice": "Samantha (Enhanced)",
+      "openai_voice": "nova",
+      "description": "Calm, young American woman"
+    },
+    {
+      "name": "George",
+      "elevenlabs_id": "JBFqnCBsd6RMkjVDRZzb",
+      "macos_voice": "Daniel (Enhanced)",
+      "openai_voice": "onyx",
+      "description": "Raspy, middle-aged British man"
+    },
+    {
+      "name": "Matilda",
+      "elevenlabs_id": "XrExE9yKIg1WjnnlVkGX",
+      "macos_voice": "Ava (Premium)",
+      "openai_voice": "shimmer",
+      "description": "Warm, young American woman"
+    },
+    {
+      "name": "Adam",
+      "elevenlabs_id": "pNInz6obpgDQGcFmaJgB",
+      "macos_voice": "Nathan (Enhanced)",
+      "openai_voice": "echo",
+      "description": "Deep American man"
+    },
+    {
+      "name": "Charlotte",
+      "elevenlabs_id": "XB0fDUnXU5powFXDhCwa",
+      "macos_voice": "Serena (Premium)",
+      "openai_voice": "alloy",
+      "description": "Seductive English-Swedish woman"
+    },
+    {
+      "name": "Brian",
+      "elevenlabs_id": "nPczCjzI2devNBz1zQrb",
+      "macos_voice": "Tom (Enhanced)",
+      "openai_voice": "fable",
+      "description": "Deep, middle-aged American narrator"
+    },
+    {
+      "name": "Dorothy",
+      "elevenlabs_id": "ThT5KcBeYPX3keUQqHPh",
+      "macos_voice": "Moira (Enhanced)",
+      "openai_voice": "nova",
+      "description": "Pleasant British woman for stories"
+    },
+    {
+      "name": "Charlie",
+      "elevenlabs_id": "IKne3meq5aSn9XLyUdCD",
+      "macos_voice": "Karen (Premium)",
+      "openai_voice": "echo",
+      "description": "Casual, young Australian man"
+    },
+    {
+      "name": "James",
+      "elevenlabs_id": "ZQe5CZNOzWyzPSCn5a3c",
+      "macos_voice": "Oliver (Enhanced)",
+      "openai_voice": "onyx",
+      "description": "Calm Australian news presenter"
+    },
+    {
+      "name": "Lily",
+      "elevenlabs_id": "pFZP5JQG7iQjIQuC4Bku",
+      "macos_voice": "Jamie (Premium)",
+      "openai_voice": "shimmer",
+      "description": "Raspy, middle-aged British narrator"
+    },
+    {
+      "name": "Antoni",
+      "elevenlabs_id": "ErXwobaYiN019PkySvjV",
+      "macos_voice": "Rishi (Enhanced)",
+      "openai_voice": "fable",
+      "description": "Well-rounded American narrator"
+    },
+    {
+      "name": "Grace",
+      "elevenlabs_id": "oWAxZDx7w5VEj9dCyTzz",
+      "macos_voice": "Zoe (Premium)",
+      "openai_voice": "alloy",
+      "description": "Warm American-Southern audiobook voice"
+    }
+  ]
+}

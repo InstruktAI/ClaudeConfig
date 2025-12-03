@@ -33,8 +33,8 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 1. Always type everything.
 
-    - TypeScript: strict types, no `any`.
-    - Python: strict, modern type hints (`list`, `dict`, `|` syntax), no `Any`.
+   - TypeScript: strict types, no `any`, with typed lists and dicts.
+   - Python: no `Any` or `object`, typed lists and dicts, modern type hints: `list`, `dict`, `|` syntax.
 
 2. Define structured data models (interfaces, dataclasses, schemas).
 3. Enforce invariants so illegal states are unrepresentable.
@@ -76,19 +76,19 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 
 ### Python
 
--   Use dict-based dispatch over long if/elif chains.
--   Use generators for streaming or large data.
--   Use context managers for resource handling.
--   Prefer dataclasses and protocols for structure.
--   Avoid mutable defaults, star imports, or classes used for namespacing.
+- Use dict-based dispatch over long if/elif chains.
+- Use generators for streaming or large data.
+- Use context managers for resource handling.
+- Prefer dataclasses and protocols for structure.
+- Avoid mutable defaults, star imports, or classes used for namespacing.
 
 ### TypeScript
 
--   Use const assertions for literals.
--   Prefer discriminated unions for state.
--   Use type guards and strict null checks.
--   Use interfaces for shapes, types for unions or aliases.
--   Avoid enum, any, default exports, and class-based namespacing.
+- Use const assertions for literals.
+- Prefer discriminated unions for state.
+- Use type guards and strict null checks.
+- Use interfaces for shapes, types for unions or aliases.
+- Avoid enum, any, default exports, and class-based namespacing.
 
 ## 9. Testing
 
@@ -113,6 +113,7 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
    - Types: feat, fix, refactor, style, docs, test, chore, perf
    - Subject: imperative, lowercase, no period, max 72 chars
 2. **Attribution footer**:
+
    ```
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
@@ -131,6 +132,7 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 **Pre-commit hooks enforce tests/linting/formatting automatically.**
 
 Only commit when:
+
 - Change is atomic and complete
 - Code works (hooks will verify)
 - No debug/temp code
@@ -154,11 +156,11 @@ Use rsync or git stash for WIP, not commits.
 
 ## Final Self-Check Before Emitting Code
 
--   [ ] Follows project config and linter
--   [ ] Uses functions, not classes, by default
--   [ ] All types explicit and modern
--   [ ] No extra abstractions or side effects
--   [ ] Dependencies explicit, not hidden
--   [ ] Fail-fast logic present
--   [ ] Logging added at key points with appropriate levels
--   [ ] Simple, short, and testable
+- [ ] Follows project config and linter
+- [ ] Uses functions, not classes, by default
+- [ ] All types explicit and modern
+- [ ] No extra abstractions or side effects
+- [ ] Dependencies explicit, not hidden
+- [ ] Fail-fast logic present
+- [ ] Logging added at key points with appropriate levels
+- [ ] Simple, short, and testable
