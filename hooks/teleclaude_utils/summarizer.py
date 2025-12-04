@@ -87,18 +87,20 @@ def generate_summary_and_title(conversation: str) -> tuple[str, str | None]:
     if not conversation.strip():
         return "Work complete!", None
 
-    prompt = f"""You are summarizing work that you have done. Write for humans tracking progress.
+    prompt = f"""Summarize what an AI assistant reported in its last messages. Write for humans tracking progress.
 
 Rules:
-- First person ("I fixed...", "I implemented...")
-- 1-2 sentences, focus on outcome/deliverable
+- First person ("I...")
+- 1-2 sentences
+- Accurately reflect what the AI said it did or observed
+- Preserve the subject: if AI said "the worker did X", say "I delegated X" or "My worker did X" - not "I did X"
 - Also provide a short title (max 50 chars)
 
 Format:
 SUMMARY: <your summary>
 TITLE: <short title>
 
-Recent conversation:
+AI's recent messages:
 {conversation}"""
 
     # Try Anthropic first
