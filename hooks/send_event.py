@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Multi-Agent Observability Hook Script
 Sends Claude Code hook events to the observability server.
@@ -13,13 +12,9 @@ import urllib.error
 import urllib.request
 from datetime import datetime
 
-from dotenv import load_dotenv
-
 from utils.logging_helper import log
 from utils.model_extractor import get_model_from_transcript
-from utils.summarizer import generate_event_summary
-
-load_dotenv()
+from utils.transcript_summarizer import summarize_transcript
 
 
 def send_event_to_server(
@@ -103,10 +98,12 @@ def main() -> None:
             except Exception:
                 pass
 
-        if args.summarize:
-            summary = generate_event_summary(event_data)
-            if summary:
-                event_data["summary"] = summary
+        if args.summarize and transcript_path:
+            result = summarize_transcript(transcript_path)
+            if "summary" in result:
+                event_data["summary"] = result["summary"]
+            if "title" in result:
+                event_data["title"] = result["title"]
 
         send_event_to_server(event_data, args.server_url, "send_event")
         log.debug(f"{args.event_type} event sent", "send_event", session_id)

@@ -1,6 +1,13 @@
+---
+argument-hint: '[branch-name]'
+description: Create a git worktree in the trees/ directory
+---
+
 # Create GitHub Issues from Implementation Plan
 
 You are tasked with converting an implementation plan into GitHub issues for parallel execution.
+The process we follow is next-work, and this is an extension to work out the task via GitHub issues.
+The objective is to ONLY WORK ON GIHUB ISSUES created from the implementation plan.
 
 ## 🚨 CRITICAL RULES (ADHERE AT ALL COSTS!)
 
@@ -27,13 +34,11 @@ You are tasked with converting an implementation plan into GitHub issues for par
 
 ## Context
 
-The user has an implementation plan (likely in `todos/IMPLEMENTATION.md` or similar) with multiple steps that can be executed in parallel or sequentially based on dependencies.
+The user has an implementation plan (likely in `todos/{subject-slug}/implementation-plan.md` or similar) with multiple steps that can be executed in parallel or sequentially based on dependencies. If NO SUBJECT WAS GIVEN, you MUST look in `todos/roadmap.md` for the first todo item that is either in progress or unstarted, and find its implementation plan.
 
 ## Your Task
 
 Execute this in **TWO PHASES**:
-
----
 
 ## PHASE 1: Analysis & Approval
 

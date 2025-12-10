@@ -19,7 +19,7 @@
           },
           {
             "type": "command",
-            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
@@ -37,7 +37,7 @@
           },
           {
             "type": "command",
-            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
@@ -73,7 +73,7 @@
           },
           {
             "type": "command",
-            "command": "uv run $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
           }
         ]
       }
@@ -125,7 +125,7 @@
     "hookify@claude-code-plugins": true,
     "plugin-dev@claude-code-plugins": true
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754048693214
   }

@@ -50,3 +50,8 @@ plugins/
 todos/
 .credentials.json
 voices.json
+
+# Runtime state
+security_warnings_state_*.json
+plans/
+commands.claude/

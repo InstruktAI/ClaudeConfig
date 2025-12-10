@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Unified TTS hook for all Claude Code events.
 Usage: tts.py --event-type <EventType>
@@ -12,14 +11,10 @@ import random
 import sys
 import time
 
-from dotenv import load_dotenv
-
 from utils.llm_manager import generate_completion_message, summarize_text
 from utils.logging_helper import log
 from utils.transcript_parser import count_messages, get_last_assistant_message
 from utils.tts_manager import speak
-
-load_dotenv()
 
 # Message templates
 NOTIFICATION_MESSAGES = [

@@ -1,4 +1,5 @@
 ---
+argument-hint: '[subject]'
 description: Create requirements document for a subject (or next roadmap item)
 ---
 
@@ -6,7 +7,7 @@ You are now in **requirements generation mode**. Follow these steps to create a 
 
 ## Step 1: Determine Subject
 
-ARGUMENT GIVEN: "$ARGUMENTS"
+SUBJECT GIVEN: "$ARGUMENTS"
 
 **If subject provided as argument**:
 
@@ -24,18 +25,26 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 ## Step 2: Create Folder Structure
 
-1. Create directory: `todos/{slug}/`
-2. Check if `todos/{slug}/requirements.md` already exists
+1. Create directory: `todos/{subject-slug}/`
+2. Check if `todos/{subject-slug}/requirements.md` already exists
 3. If it exists:
    - Read the existing requirements
+   - determine completeness
    - Ask user if they want to:
      - Skip to `/next-implementation` (already has requirements)
-     - Regenerate the requirements (overwrite)
+     - Review the requirements together and identify gaps
      - Abort
 
-## Step 3: Generate Requirements Document
+## Step 3: Clarify Gaps (interactive, required)
 
-Create `todos/{slug}/requirements.md` with this structure:
+Before writing anything, ask concise questions to fill gaps in **Problem**, **Goals**, **Non-Goals**, **User Stories**, **Technical Constraints**, and **Success Criteria**.
+
+- If answers remain unclear or the user opts out, **stop** and summarize the missing items; do not write `requirements.md`.
+- Proceed to Step 4 only after the above areas are answered sufficiently.
+
+## Step 4: Generate Requirements Document
+
+Create `todos/{subject-slug}/requirements.md` with this structure:
 
 ```markdown
 # {Title}
@@ -108,7 +117,7 @@ How will we know this is successful?
 ## References
 
 - Related roadmap items
-- Architecture docs (docs/architecture.md, CLAUDE.md)
+- Architecture docs
 - External resources
 ```
 
@@ -132,13 +141,13 @@ If subject came from roadmap:
 Report to user:
 
 ```
-✅ Requirements created: todos/{slug}/requirements.md
+✅ Requirements created: todos/{subject-slug}/requirements.md
 
 📋 Subject: {subject}
 🎯 Primary goals: {count}
 ✅ Success criteria: {count}
 
-Next step: Run /next-implementation {slug}
+Next step: Run /next-implementation {subject-slug}
 ```
 
 ## Important Notes

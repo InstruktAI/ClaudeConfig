@@ -1,5 +1,8 @@
 ---
-description: Find out what to do next and continue WIP or break down todo story into requirements + implementation plan. Start here if asked to do work.
+argument-hint: '[subject]'
+description: Find out what to do next and continue WIP or break down todo story into
+  requirements + implementation plan. Use for queries like \"what's next\", \"next-work\",
+  \"next\", \"work\", or \"start work\".
 ---
 
 You are now in **WORK mode**. Your output is ALWAYS working code that is covered by tests.
@@ -18,13 +21,13 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 **If subject provided as argument**:
 
-- Use that subject to find `todos/{slug}/` folder
+- Use that subject to find `todos/{subject-slug}/` folder
 
 **If NO subject provided**:
 
 1. Read `todos/roadmap.md`
 2. Find the item marked as in-progress (`- [>]`)
-3. If no in-progress item, find first unchecked item (`- [ ]`)
+3. If no in-progress item, find first unchecked item (`- [ ]`) that is clear to you (mark `[~]` if unsure and ask for input)
 4. Extract description and generate slug
 5. Use that as the subject
 
@@ -35,18 +38,18 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 1. **Check if worktree already exists**:
 
    - Run `/list-worktrees`
-   - Look for worktree with branch name matching `{slug}`
+   - Look for worktree with branch name matching `{subject-slug}`
 
 2. **If worktree exists**:
 
-   - Switch to existing worktree directory: `cd worktrees/{slug}`
+   - Switch to existing worktree directory: `cd worktrees/{subject-slug}`
    - Continue with existing work
 
 3. **If worktree does NOT exist**:
-   - Run `/create-worktree {slug}` (no port offset needed)
+   - Run `/create-worktree {subject-slug}` (no port offset needed)
    - This will:
-     - Create `worktrees/{slug}/` directory
-     - Create git branch `{slug}`
+     - Create `worktrees/{subject-slug}/` directory
+     - Create git branch `{subject-slug}`
      - Set up isolated environment
      - Switch to the worktree directory
    - Run `make install` first to get all the tools to work
@@ -56,18 +59,20 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 ## Step 4: Check Requirements & Implementation Plan Exist
 
-1. Check if `todos/{slug}/requirements.md` exists
+1. Check if `todos/{subject-slug}/requirements.md` exists
 
    - If NOT: Run `/next-requirements {subject}`
    - Wait for it to complete, then continue
 
-2. Check if `todos/{slug}/implementation-plan.md` exists
-   - If NOT: Run `/next-implementation {slug}`
+2. Check if `todos/{subject-slug}/implementation-plan.md` exists
+   - If NOT: Run `/next-implementation {subject-slug}`
    - Wait for it to complete, then continue
+
+If neither requirements nor a clear roadmap item exist (or info is unclear), run `/next-roadmap` to gather details before continuing.
 
 ## Step 5: Assess Current State
 
-1. Read `todos/{slug}/implementation-plan.md`
+1. Read `todos/{subject-slug}/implementation-plan.md`
 2. Count unchecked boxes in each section
 3. Determine what's actually incomplete
 
@@ -76,8 +81,8 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 ## Step 6: Execute Implementation Plan
 
-1. Read `todos/{slug}/requirements.md` to understand the goals
-2. Read `todos/{slug}/implementation-plan.md` to see the task breakdown
+1. Read `todos/{subject-slug}/requirements.md` to understand the goals
+2. Read `todos/{subject-slug}/implementation-plan.md` to see the task breakdown
 3. Determine outstanding tasks
 
 ### Task Execution Strategy
@@ -106,13 +111,13 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 4. **Complete task workflow** (per task):
 
    - Make code changes
-   - **Delegate to `debugger` subagent**: Run tests and fix issues (`make lint && make test`)
-   - Update checkbox from `- [ ]` to `- [x]` in `todos/{slug}/implementation-plan.md`
-   - Commit ONCE with both code changes AND todo update: `/commit`
+   - **Delegate to `debugger` subagent**: Run tests and fix issues
+   - Update checkbox from `- [ ]` to `- [x]` in `todos/{subject-slug}/implementation-plan.md`
+   - Commit ONCE with both code changes AND todo update: `/commit-commands:commit`
 
    **IMPORTANT**:
 
-   - Use `/commit` (not `/deploy`) while in worktree
+   - Use `/commit-commands:commit` while in worktree
    - Each commit = one completed task (code + todo checkbox)
    - Only use `/deploy` after merging to main branch
 
@@ -138,8 +143,8 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 ### 7.1 Verify Requirements Alignment
 
-1. Read `todos/{slug}/requirements.md`
-2. Get code changes: `git diff main..{slug}`
+1. Read `todos/{subject-slug}/requirements.md`
+2. Get code changes: `git diff main..{subject-slug}`
 3. Confirm all requirements are addressed in the implementation
 4. Report any missing requirements
 
@@ -158,7 +163,7 @@ This spawns specialized agents that auto-select based on changes:
 ### 7.3 Capture Review Findings
 
 1. Wait for all agents to complete
-2. Aggregate agent reports into `todos/{slug}/review-findings.md`
+2. Aggregate agent reports into `todos/{subject-slug}/review-findings.md`
 3. Parse findings to identify:
    - Critical issues (must fix)
    - Auto-fixable issues
@@ -169,13 +174,13 @@ This spawns specialized agents that auto-select based on changes:
 **For each auto-fixable issue**:
 
 1. Apply fix using appropriate tools (Edit/Write)
-2. Run relevant tests: `make lint && make test`
+2. Run linter and tests: `make lint && make test` (or `(pnpm|npm run|bun) test`)
 3. If tests pass: continue to next fix
 4. If tests fail: debug and retry
 
 **After all fixes applied**:
 
-1. Commit all fixes in one commit: `/commit` with message "fix: address review findings"
+1. Commit all fixes in one commit: `/commit-commands:commit` with message "fix: address review findings"
 2. Update checkbox in `implementation-plan.md`: "Review feedback handled"
 
 ### 7.5 Quality Gate
@@ -203,7 +208,7 @@ This spawns specialized agents that auto-select based on changes:
 1. **Ensure all changes committed in worktree**:
 
    - Verify `git status` is clean
-   - All tasks should be committed (you've been doing `/commit` per task)
+   - All tasks should be committed (you've been doing `/commit-commands:commit` per task)
 
 2. **Switch back to main branch**:
 
@@ -212,18 +217,17 @@ This spawns specialized agents that auto-select based on changes:
 
 3. **Merge worktree branch to main**:
 
-   - `git merge {slug}`
+   - `git merge {subject-slug}`
    - Resolve any conflicts if needed
 
-4. **Push and deploy to all machines**:
+4. **Push to git**:
 
-   - Run `/deploy` to push to GitHub and deploy to all machines
+   - git push origin main
    - No new commit needed - merge already brought all commits to main
-   - This pushes everything and deploys to production
 
 5. **Remove worktree**:
 
-   - Run `/remove_worktree_prompt {slug}`
+   - Run `/remove-worktree {subject-slug}`
    - This removes both the worktree directory and branch
 
 6. **Verify cleanup**:
@@ -236,7 +240,7 @@ This spawns specialized agents that auto-select based on changes:
 - **Parallel execution**: When possible, execute independent tasks simultaneously
 - **Testing is mandatory**: All code changes must have passing tests
 - **Commit per task**: One commit = code changes + checkbox update (NOT two separate commits)
-- **Use /commit in worktree**: Create local commits with `/commit` (no deployment yet)
+- **Use /commit in worktree**: Create local commits with `/commit-commands:commit` (no deployment yet)
 - **Use /deploy after merge**: Only push and deploy after merging to main
 - **Check dependencies**: Always verify `**DEPENDS:**` requirements are met
 - **Update roadmap**: Mark items in-progress (`[>]`) and complete (`[x]`)
@@ -253,9 +257,22 @@ For each work session:
 5. 🎯 Identify current task group
 6. ⚡ Execute parallel tasks simultaneously
 
-**Per task completion**: 7. 🧪 Run `make lint && make test` 8. ✔️ Update checkbox in implementation-plan.md 9. 💾 `/commit` (one commit with code + checkbox)
+**Per task completion**:
 
-**After all implementation tasks**: 10. 📋 Verify requirements alignment (Step 7.1) 11. 🔍 Code review: `/pr-review-toolkit:review-pr all` (Step 7.2) 12. 📝 Aggregate findings to review-findings.md (Step 7.3) 13. 🔧 Auto-fix all issues (Step 7.4) 14. ✅ Quality gate check (Step 7.5) 15. 🔀 Merge to main: `cd ../.. && git checkout main && git merge {slug}` 16. 🚀 Deploy: `/deploy` (push to everyone) 17. 🧹 Cleanup: `/remove_worktree_prompt {slug}`
+7. 🧪 Run linter and tests
+8. ✔️ Update checkbox in implementation-plan.md
+9. 💾 `/commit-commands:commit` (one commit with code + checkbox)
+
+**After all implementation tasks**:
+
+10. 📋 Verify requirements alignment (Step 7.1)
+11. 🔍 Code review: `/pr-review-toolkit:review-pr all` (Step 7.2)
+12. 📝 Aggregate findings to review-findings.md (Step 7.3) 
+13. 🔧 Auto-fix all issues (Step 7.4)
+14. 14. ✅ Quality gate check (Step 7.5)
+15. 🔀 Merge to main: `cd ../.. && git checkout main && git merge {subject-slug}`
+16. 🚀 Push to git
+17. 🧹 Cleanup: `/remove_worktree {subject-slug}`
 
 ## Error Handling
 

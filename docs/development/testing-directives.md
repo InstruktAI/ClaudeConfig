@@ -12,6 +12,7 @@ For multi-computer systems (TeleClaude, distributed services, embedded systems):
 
 1. **Make changes locally** - write code, run targeted automated tests
 2. **Rsync to target computer(s)** - sync during development, not after:
+
    ```bash
    # Use shorthand from config.yml (e.g., raspi, raspi4)
    bin/rsync.sh <computer-name>
@@ -19,6 +20,7 @@ For multi-computer systems (TeleClaude, distributed services, embedded systems):
    # Then restart daemon on remote
    ssh -A user@hostname 'cd $HOME/apps/TeleClaude && make restart'
    ```
+
 3. **Real-world testing** - create TEST sessions to verify actual behavior:
    - Use `teleclaude__start_session` with title: `"TEST: {what you're testing}"`
    - Example: `"TEST: session lookup"` → generates channel: `$MozBook > $RasPi[apps/TeleClaude] - TEST: session lookup`
@@ -35,6 +37,7 @@ For multi-computer systems (TeleClaude, distributed services, embedded systems):
 ### TEST Session Naming Convention
 
 When creating sessions for testing (not production use):
+
 - **Always prefix with `TEST:`** to distinguish from production sessions
 - Be specific about what you're testing
 - Examples:
@@ -78,12 +81,14 @@ make test  # DON'T do this during active debugging
 ### **CRITICAL: Always Use Parallel Execution with Bash Timeout**
 
 **Every test invocation MUST include:**
+
 - `-n auto` for parallel execution (pytest-xdist)
 - **Bash tool timeout based on test type:**
   - **Unit tests: 3000ms (3s)** - fast, parallel, should complete quickly
   - **Integration tests: 15000ms (15s)** - slower, involve I/O and real systems
 
 **Examples:**
+
 ```bash
 # ✅ CORRECT - unit tests with 3s timeout
 .venv/bin/pytest -n auto tests/unit/test_foo.py -v  # Use timeout=3000 in Bash tool

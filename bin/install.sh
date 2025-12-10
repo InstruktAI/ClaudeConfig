@@ -152,17 +152,6 @@ else
   echo ""
 fi
 
-# Install uv (Python package manager)
-if command -v uv &> /dev/null; then
-  echo "→ uv already installed ($(uv --version))"
-  echo ""
-else
-  echo "→ Installing uv (Python package manager)..."
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  echo "  ✓ uv installed"
-  echo ""
-fi
-
 # Install bun (JavaScript runtime)
 if command -v bun &> /dev/null; then
   echo "→ bun already installed ($(bun --version))"

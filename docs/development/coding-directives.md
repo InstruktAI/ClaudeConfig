@@ -89,6 +89,7 @@ Purpose: Define what to produce — not why. Apply in every project unless confi
 - Use type guards and strict null checks.
 - Use interfaces for shapes, types for unions or aliases.
 - Avoid enum, any, default exports, and class-based namespacing.
+- **Property checks**: Use `'prop' in obj` for type guards/narrowing (TypeScript needs this for type inference). Use `obj.prop` for simple truthy checks where type narrowing isn't needed.
 
 ## 9. Testing
 

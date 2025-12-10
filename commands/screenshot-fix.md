@@ -1,6 +1,8 @@
-# Screenshot Fix Command
-
-## Purpose
+---
+argument-hint: '[screenshot-path]'
+description: Fix UI issues based on a screenshot provided by the user or the latest
+  screenshot
+---
 
 This command helps fix UI issues by analyzing a screenshot provided by the user or the latest screenshot.
 

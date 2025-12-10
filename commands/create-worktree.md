@@ -1,8 +1,6 @@
 ---
-model: claude-sonnet-4-5-20250929
+argument-hint: '[branch-name]'
 description: Create a git worktree in the trees/ directory
-argument-hint: <branch-name>
-allowed-tools: Bash, Read, Glob
 ---
 
 # Create Git Worktree

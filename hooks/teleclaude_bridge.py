@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run --quiet --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
+#!/usr/bin/env python3
 # TeleClaude bridge hook - forwards Claude Code events to TeleClaude daemon
 #
 # This is the ONLY place that communicates with TeleClaude.
@@ -15,20 +11,15 @@
 import json
 import os
 import random
-import subprocess
 import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
 
-# Add hooks directory to path for imports (must be before local imports)
-sys.path.insert(0, str(Path(__file__).parent))
+from utils.mcp_send import mcp_send
+from utils.transcript_summarizer import summarize_transcript
 
-from teleclaude_utils.mcp_send import (  # noqa: E402  # pylint: disable=import-error
-    mcp_send,
-)
-
-LOG_DIR = Path.home() / ".claude" / "hooks" / "logs"
+LOG_DIR = Path.home() / ".claude" / "logs"
 LOG_FILE = LOG_DIR / "teleclaude_bridge.log"
 # State file tracks last processed transcript mtime per session to dedupe Stop events
 STATE_FILE = LOG_DIR / "bridge_state.json"
@@ -121,99 +112,92 @@ def send_event(teleclaude_session_id: str, event_type: str, data: dict) -> None:
     log(f"Sent {event_type} event to daemon")
 
 
-def handle_notification(teleclaude_session_id: str, message: str | None) -> None:
-    """Handle notification event - generate message and send via event.
-    Skip for 'Claude is waiting for your input', because that gets sent after 60s and we already sent a summary."""
+def handle_notification(teleclaude_session_id: str, message: str | None, notification_type: str | None) -> None:
+    """Handle notification event - forward to daemon for listener notification and Telegram feedback.
+
+    For AskUserQuestion and other input-required notifications, the original message contains
+    the actual question content. This is forwarded to registered listeners (calling AIs) so they
+    can respond to what the remote session is asking.
+
+    Skip for 'Claude is waiting for your input' (60s idle prompt) - we already sent a summary.
+    """
     if message == "Claude is waiting for your input":
         log("Skipping notification for 'Claude is waiting for your input'")
         return
 
+    # For user-facing feedback in Telegram, use a friendly message
+    # The original message goes in original_message for listener forwarding
     engineer_name = os.getenv("ENGINEER_NAME", "").strip()
-    log(f"Engineer name: {engineer_name or '(not set)'}")
-
-    # Create notification message with 30% chance to include name
     prefix = f"{engineer_name}, " if engineer_name and random.random() < 0.3 else ""
     random_message = random.choice(NOTIFICATION_MESSAGES)
-    message = prefix + (random_message[0].lower() + random_message[1:]) if prefix else random_message
-    log(f"Generated notification: {message}")
+    friendly_message = prefix + (random_message[0].lower() + random_message[1:]) if prefix else random_message
 
-    # Send as event - daemon handles the actual notification
-    send_event(teleclaude_session_id, "notification", {"message": message})
+    log(f"Notification type: {notification_type}, original message: {message}")
+    log(f"Friendly message for Telegram: {friendly_message}")
+
+    # Send event with both messages:
+    # - message: friendly message for Telegram feedback
+    # - original_message: actual question/notification for listener forwarding
+    send_event(
+        teleclaude_session_id,
+        "notification",
+        {
+            "message": friendly_message,
+            "original_message": message,
+            "notification_type": notification_type,
+        },
+    )
 
 
 def run_summarizer(transcript_path: str) -> dict:
-    """Run summarizer utility and return parsed JSON result.
+    """Run summarizer and return result.
 
     Returns:
         Dict with "summary" and "title" keys, or "error" key on failure.
     """
-    hooks_dir = Path(__file__).parent
-    summarizer = hooks_dir / "teleclaude_utils" / "summarizer.py"
-
-    if not summarizer.exists():
-        log(f"Summarizer not found: {summarizer}")
-        return {"error": "Summarizer not found"}
-
-    log(f"Running summarizer: {summarizer}")
-
+    log(f"Running summarizer for: {transcript_path}")
     try:
-        result = subprocess.run(
-            ["uv", "run", "--quiet", str(summarizer), transcript_path],
-            capture_output=True,
-            text=True,
-            timeout=30,  # 30 second timeout for API calls
-            check=False,  # We check returncode manually below
-        )
-
-        if result.returncode != 0:
-            log(f"Summarizer failed: {result.stderr}")
-            return {"error": result.stderr or "Summarizer failed"}
-
-        output = result.stdout.strip()
-        log(f"Summarizer output: {output}")
-
-        return json.loads(output)
-
-    except subprocess.TimeoutExpired:
-        log("Summarizer timed out")
-        return {"error": "Summarizer timed out"}
-    except json.JSONDecodeError as e:
-        log(f"Invalid JSON from summarizer: {e}")
-        return {"error": f"Invalid JSON: {e}"}
+        result = summarize_transcript(transcript_path)
+        log(f"Summarizer output: {result}")
+        return result
     except Exception as e:
         log(f"Summarizer error: {e}")
         return {"error": str(e)}
 
 
 def handle_stop(teleclaude_session_id: str, transcript_path: str, original_data: dict) -> None:
-    """Handle stop event - run summarizer and send summary event.
+    """Handle stop event - run summarizer and send single enriched stop event.
 
     Deduplicates Stop events by tracking transcript file mtime.
     Claude Code fires multiple Stop events even when no new work was done,
     which would cause duplicate "Work complete!" messages in Telegram.
+
+    The stop event includes both title and summary from summarizer so that:
+    - Listener notifications include the title (for AI-to-AI workflows)
+    - Telegram notifications include the summary
+    - Title updates work as expected
+
+    We send ONE stop event with all data, not separate stop + summary events.
     """
-    # First forward the original stop event (always - for listener notifications)
-    send_event(teleclaude_session_id, "stop", original_data)
+    # Run summarizer first (if applicable) - check mtime to deduplicate
+    if transcript_path and not should_skip_summary(transcript_path):
+        summary_result = run_summarizer(transcript_path)
+        if "error" in summary_result:
+            log(f"Summarizer failed: {summary_result['error']}")
+            summary_result = {"summary": "Work complete!", "title": None}
+    else:
+        # Skipped (duplicate) or no transcript - send minimal stop event
+        summary_result = {}
 
-    if not transcript_path:
-        log("No transcript path, skipping summarizer")
-        return
+    # Build enriched stop event with all data
+    stop_data = dict(original_data)
+    if summary_result.get("title"):
+        stop_data["title"] = summary_result["title"]
+    if summary_result.get("summary"):
+        stop_data["summary"] = summary_result["summary"]
 
-    # Check if transcript has changed since last summary
-    if should_skip_summary(transcript_path):
-        log("Skipping summary - transcript unchanged since last summary")
-        return
-
-    # Run summarizer and get result
-    result = run_summarizer(transcript_path)
-
-    if "error" in result:
-        log(f"Summarizer failed: {result['error']}")
-        # Send default summary on error
-        result = {"summary": "Work complete!", "title": None}
-
-    # Send summary event - daemon handles notification and title update
-    send_event(teleclaude_session_id, "summary", result)
+    # Send single enriched stop event (daemon handles everything from this one event)
+    send_event(teleclaude_session_id, "stop", stop_data)
 
 
 def main() -> None:
@@ -253,7 +237,11 @@ def main() -> None:
 
         # Route to appropriate handler
         if event_type == "notification":
-            handle_notification(teleclaude_session_id, data.get("message", None))
+            handle_notification(
+                teleclaude_session_id,
+                data.get("message", None),
+                data.get("notification_type", None),
+            )
         elif event_type == "stop":
             transcript_path = data.get("transcript_path", "")
             handle_stop(teleclaude_session_id, transcript_path, data)

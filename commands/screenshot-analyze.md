@@ -1,6 +1,7 @@
-# Screenshot Analyze Command
-
-## Purpose
+---
+argument-hint: '[screenshot-path]'
+description: Analyze a screenshot provided by the user or the latest screenshot
+---
 
 This command analyzes a screenshot provided by the user or the latest screenshot.
 

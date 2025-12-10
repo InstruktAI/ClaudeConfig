@@ -1,8 +1,6 @@
 ---
-model: claude-sonnet-4-5-20250929
+argument-hint: '[branch-name]'
 description: Remove a git worktree and optionally delete its branch
-argument-hint: <branch-name>
-allowed-tools: Bash, Read
 ---
 
 # Remove Git Worktree

@@ -1,7 +1,5 @@
 ---
-model: claude-sonnet-4-5-20250929
 description: List all git worktrees with status
-allowed-tools: Bash, Read, Glob
 ---
 
 # List Git Worktrees

@@ -1,9 +1,5 @@
-#!/usr/bin/env -S uv run --quiet --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
-"""Send notification to TeleClaude via MCP socket (reads JSON from stdin).
+#!/usr/bin/env python3
+"""Send notification to TeleClaude via MCP socket.
 
 Gracefully handles missing TeleClaude installation - returns silently if socket doesn't exist.
 """
@@ -15,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 MCP_SOCKET = "/tmp/teleclaude.sock"
-LOG_DIR = Path.home() / ".claude" / "hooks" / "logs"
+LOG_DIR = Path.home() / ".claude" / "logs"
 LOG_FILE = LOG_DIR / "mcp_send.log"
 
 

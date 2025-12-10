@@ -1,4 +1,5 @@
 ---
+argument-hint: '[subject]'
 description: Create implementation plan from requirements with parallel task support
 ---
 
@@ -6,7 +7,7 @@ You are now in **implementation planning mode**. Follow these steps to create an
 
 ## Step 1: Determine Subject
 
-ARGUMENT GIVEN: "$ARGUMENTS"
+SUBJECT GIVEN: "$ARGUMENTS"
 
 **If subject provided as argument**:
 
@@ -20,12 +21,12 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 
 ## Step 2: Load Requirements
 
-1. Read `todos/{slug}/requirements.md`
+1. Read `todos/{subject-slug}/requirements.md`
 2. If file doesn't exist:
    - Error: "Requirements not found. Run /next-requirements {subject} first"
    - Stop execution
 
-## Step 3: Analyze Requirements for Implementation
+## Step 3: Analyze Requirements for Implementation  
 
 Extract actionable work from requirements document:
 
@@ -36,12 +37,12 @@ Extract actionable work from requirements document:
 
 ## Step 4: Create Implementation Plan
 
-Create `todos/{slug}/implementation-plan.md` with this structure:
+Create `todos/{subject-slug}/implementation-plan.md` with this structure:
 
 ```markdown
 # {Title} - Implementation Plan
 
-> **Requirements**: todos/{slug}/requirements.md
+> **Requirements**: todos/{subject-slug}/requirements.md
 > **Status**: 🚧 Ready to Implement
 > **Created**: {current date}
 
@@ -85,7 +86,7 @@ _These tasks can run in parallel_
 
 _These tasks must run sequentially_
 
-- [ ] Review created (automated via `/review {slug}`)
+- [ ] Review created (automated via `/review {subject-slug}`)
 - [ ] Review feedback handled (automated by spawned agent)
 
 ### Group 6: Deployment
@@ -94,10 +95,10 @@ _These tasks must run sequentially_
 
 - [ ] Test locally with `make restart && make status`
 - [ ] Switch to main: `cd ../.. && git checkout main`
-- [ ] Merge worktree branch: `git merge {slug}`
-- [ ] Push and deploy: `/deploy`
+- [ ] Merge worktree branch: `git merge {subject-slug}`
+- [ ] Push to git
 - [ ] Verify deployment on all computers
-- [ ] Cleanup worktree: `/remove_worktree_prompt {slug}`
+- [ ] Cleanup worktree: `/remove_worktree {subject-slug}`
 
 ## Task Markers
 
@@ -133,7 +134,7 @@ Before marking complete, verify all requirements success criteria:
 
 - [ ] Success criterion 1 (from requirements.md)
 - [ ] Success criterion 2
-- [ ] All tests pass (`make lint && make test`)
+- [ ] All linters and tests pass
 - [ ] Code formatted and linted
 - [ ] Deployed to all machines
 
@@ -183,14 +184,14 @@ Before marking complete, verify all requirements success criteria:
 Report to user:
 
 ```
-✅ Implementation plan created: todos/{slug}/implementation-plan.md
+✅ Implementation plan created: todos/{subject-slug}/implementation-plan.md
 
 📋 Total groups: {count}
 🔄 Parallel tasks: {count}
 ➡️  Sequential tasks: {count}
 🎯 First group: {first group name} ({task count} tasks)
 
-Next step: Run /next-work {slug}
+Next step: Run /next-work {subject-slug}
 ```
 
 ## Important Notes

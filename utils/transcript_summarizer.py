@@ -1,24 +1,33 @@
-#!/usr/bin/env -S uv run --quiet --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["anthropic", "openai"]
-# ///
-"""Pure summarizer utility - generates summary and title from transcript.
+#!/usr/bin/env python3
+"""Summarizer utility - generates summary and title from transcript.
 
-Input: transcript_path as argv[1]
-Output: JSON to stdout {"summary": "...", "title": "..."}
-
-This utility knows NOTHING about TeleClaude, MCP, or messaging.
-It's a pure text-in/JSON-out processor.
+Can be imported as a module or run as a script.
 """
 
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from anthropic import Anthropic
+from dotenv import load_dotenv
 from openai import OpenAI
+
+load_dotenv()
+
+LOG_FILE = Path.home() / ".claude" / "logs" / "summarizer.log"
+
+
+def log(message: str) -> None:
+    """Write log message to file."""
+    try:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            timestamp = datetime.now().isoformat()
+            f.write(f"[{timestamp}] {message}\n")
+    except Exception:
+        pass
 
 
 def extract_assistant_since_last_user(transcript_path: Path) -> str:
@@ -78,6 +87,20 @@ def extract_assistant_since_last_user(transcript_path: Path) -> str:
     return combined
 
 
+def _parse_response(text: str) -> tuple[str, str | None]:
+    """Parse LLM response into summary and title."""
+    summary = "Work complete!"
+    title = None
+
+    for line in text.strip().split("\n"):
+        if line.startswith("SUMMARY:"):
+            summary = line[8:].strip()
+        elif line.startswith("TITLE:"):
+            title = line[6:].strip()[:50]  # Max 50 chars
+
+    return summary, title
+
+
 def generate_summary_and_title(conversation: str) -> tuple[str, str | None]:
     """Generate summary and title using Claude API (with OpenAI fallback).
 
@@ -114,8 +137,8 @@ AI's recent messages:
                 messages=[{"role": "user", "content": prompt}],
             )
             return _parse_response(response.content[0].text)
-        except Exception:
-            pass  # Fall through to OpenAI
+        except Exception as e:
+            log(f"Anthropic API failed: {e}")
 
     # Try OpenAI as fallback
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -128,46 +151,45 @@ AI's recent messages:
                 messages=[{"role": "user", "content": prompt}],
             )
             return _parse_response(response.choices[0].message.content or "")
-        except Exception:
-            pass  # Fall through to default
+        except Exception as e:
+            log(f"OpenAI API failed: {e}")
+
+    # No API keys or all failed
+    if not anthropic_key and not openai_key:
+        log("No API keys found (ANTHROPIC_API_KEY or OPENAI_API_KEY)")
 
     return "Work complete!", None
 
 
-def _parse_response(text: str) -> tuple[str, str | None]:
-    """Parse LLM response into summary and title."""
-    summary = "Work complete!"
-    title = None
+def summarize_transcript(transcript_path: str) -> dict:
+    """Generate summary and title from transcript file.
 
-    for line in text.strip().split("\n"):
-        if line.startswith("SUMMARY:"):
-            summary = line[8:].strip()
-        elif line.startswith("TITLE:"):
-            title = line[6:].strip()[:50]  # Max 50 chars
+    Args:
+        transcript_path: Path to Claude session .jsonl file
 
-    return summary, title
+    Returns:
+        Dict with "summary" and "title" keys, or "error" key on failure.
+    """
+    path = Path(transcript_path)
+
+    if not path.exists():
+        return {"error": f"Transcript not found: {transcript_path}"}
+
+    assistant_output = extract_assistant_since_last_user(path)
+    summary, title = generate_summary_and_title(assistant_output)
+
+    return {"summary": summary, "title": title}
 
 
 def main() -> int:
-    """Read transcript, generate summary/title, output JSON to stdout."""
+    """CLI entry point - read transcript, generate summary/title, output JSON to stdout."""
     if len(sys.argv) != 2:
         print(json.dumps({"error": f"Usage: {sys.argv[0]} <transcript_path>"}))
         return 1
 
-    transcript_path = sys.argv[1]
-    path = Path(transcript_path)
-
-    if not path.exists():
-        print(json.dumps({"error": f"Transcript not found: {transcript_path}"}))
-        return 1
-
-    # Extract assistant messages since last user input (no tool calls)
-    assistant_output = extract_assistant_since_last_user(path)
-    summary, title = generate_summary_and_title(assistant_output)
-
-    # Output JSON to stdout - the ONLY output contract
-    print(json.dumps({"summary": summary, "title": title}))
-    return 0
+    result = summarize_transcript(sys.argv[1])
+    print(json.dumps(result))
+    return 1 if "error" in result else 0
 
 
 if __name__ == "__main__":
