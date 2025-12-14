@@ -1,6 +1,7 @@
 """
 Unified logging helper for Claude Code hooks.
 All log levels go to ~/.claude/logs/hooks.log
+Logs rotate at 1MB (up to 5 backups).
 
 Usage:
     from utils.logging_helper import log
@@ -14,11 +15,15 @@ Configuration:
 
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
 
-load_dotenv()
+from utils.file_log import append_line
+
+# Load .env from ~/.claude/ since hooks run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
 
 # Log level hierarchy: DEBUG < INFO < WARN < ERROR
 _LEVELS = {"debug": 0, "info": 1, "warn": 2, "error": 3}
@@ -58,8 +63,7 @@ def _write_log(
         log_entry += f" | {type(error).__name__}: {error}"
 
     try:
-        with open(log_path, "a") as f:
-            f.write(log_entry + "\n")
+        append_line(log_path, log_entry)
     except Exception:
         pass  # Don't crash if logging fails
 
@@ -68,20 +72,20 @@ class _Logger:
     """Simple logger with level methods."""
 
     def debug(self, message: str, hook_name: str, session_id: Optional[str] = None) -> None:
-        _write_log("DEBUG", message, hook_name, session_id)
+        _write_log("debug", message, hook_name, session_id)
 
     def info(self, message: str, hook_name: str, session_id: Optional[str] = None) -> None:
-        _write_log("INFO", message, hook_name, session_id)
+        _write_log("info", message, hook_name, session_id)
 
     def warn(
         self, message: str, hook_name: str, session_id: Optional[str] = None, error: Optional[Exception] = None
     ) -> None:
-        _write_log("WARN", message, hook_name, session_id, error)
+        _write_log("warn", message, hook_name, session_id, error)
 
     def error(
         self, message: str, hook_name: str, session_id: Optional[str] = None, error: Optional[Exception] = None
     ) -> None:
-        _write_log("ERROR", message, hook_name, session_id, error)
+        _write_log("error", message, hook_name, session_id, error)
 
 
 # Single global logger instance

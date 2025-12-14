@@ -14,7 +14,10 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+from utils.file_log import append_line
+
+# Load .env from ~/.claude/ since hooks run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
 
 LOG_FILE = Path.home() / ".claude" / "logs" / "summarizer.log"
 
@@ -22,10 +25,7 @@ LOG_FILE = Path.home() / ".claude" / "logs" / "summarizer.log"
 def log(message: str) -> None:
     """Write log message to file."""
     try:
-        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
-            timestamp = datetime.now().isoformat()
-            f.write(f"[{timestamp}] {message}\n")
+        append_line(LOG_FILE, f"[{datetime.now().isoformat()}] {message}")
     except Exception:
         pass
 

@@ -19,6 +19,7 @@ import logging
 import time
 import urllib.parse
 from datetime import datetime, timedelta
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
 
@@ -33,13 +34,22 @@ log_dir = Path.home() / ".claude" / "logs"
 log_dir.mkdir(parents=True, exist_ok=True)
 log_file = log_dir / "youtube_helper.log"
 
-logging.basicConfig(
-    filename=str(log_file),
-    level=logging.INFO,
-    format="[%(asctime)s] [%(levelname)s] [youtube_helper] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-log = logging.getLogger(__name__)
+log = logging.getLogger("youtube_helper")
+log.setLevel(logging.INFO)
+if not any(isinstance(handler, RotatingFileHandler) for handler in log.handlers):
+    handler = RotatingFileHandler(
+        str(log_file),
+        maxBytes=1_000_000,
+        backupCount=5,
+        encoding="utf-8",
+    )
+    handler.setFormatter(
+        logging.Formatter(
+            fmt="[%(asctime)s] [%(levelname)s] [youtube_helper] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+    log.addHandler(handler)
 
 
 class Transcript(BaseModel):

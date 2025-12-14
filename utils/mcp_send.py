@@ -10,6 +10,8 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
+from utils.file_log import append_line
+
 MCP_SOCKET = "/tmp/teleclaude.sock"
 LOG_DIR = Path.home() / ".claude" / "logs"
 LOG_FILE = LOG_DIR / "mcp_send.log"
@@ -18,10 +20,7 @@ LOG_FILE = LOG_DIR / "mcp_send.log"
 def log(message: str) -> None:
     """Write log message to file."""
     try:
-        LOG_DIR.mkdir(parents=True, exist_ok=True)
-        with open(LOG_FILE, "a") as f:
-            timestamp = datetime.now().isoformat()
-            f.write(f"[{timestamp}] {message}\n")
+        append_line(LOG_FILE, f"[{datetime.now().isoformat()}] {message}")
     except Exception:
         pass
 

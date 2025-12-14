@@ -16,6 +16,7 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
+from utils.file_log import append_line
 from utils.mcp_send import mcp_send
 from utils.transcript_summarizer import summarize_transcript
 
@@ -36,10 +37,7 @@ NOTIFICATION_MESSAGES = [
 def log(message: str) -> None:
     """Write log message to file."""
     try:
-        LOG_DIR.mkdir(parents=True, exist_ok=True)
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
-            timestamp = datetime.now().isoformat()
-            f.write(f"[{timestamp}] {message}\n")
+        append_line(LOG_FILE, f"[{datetime.now().isoformat()}] {message}")
     except Exception:  # noqa: S110
         pass
 
@@ -63,44 +61,44 @@ def save_state(state: dict) -> None:
         pass
 
 
-def should_skip_summary(transcript_path: str) -> bool:
-    """Check if this Stop event should be skipped (transcript unchanged since last summary).
+# def should_skip_summary(transcript_path: str) -> bool:
+#     """Check if this Stop event should be skipped (transcript unchanged since last summary).
 
-    Claude Code fires multiple Stop events even when Claude hasn't done any new work.
-    This causes duplicate "Work complete!" messages to pile up in Telegram.
+#     Claude Code fires multiple Stop events even when Claude hasn't done any new work.
+#     This causes duplicate "Work complete!" messages to pile up in Telegram.
 
-    We track the transcript file's mtime and skip if unchanged since last summary.
-    Key is the transcript path itself (not TeleClaude session ID) because:
-    - Same Claude Code session = same transcript file
-    - TeleClaude session IDs change on restart but transcript stays the same
-    """
-    if not transcript_path:
-        return False
+#     We track the transcript file's mtime and skip if unchanged since last summary.
+#     Key is the transcript path itself (not TeleClaude session ID) because:
+#     - Same Claude Code session = same transcript file
+#     - TeleClaude session IDs change on restart but transcript stays the same
+#     """
+#     if not transcript_path:
+#         return False
 
-    try:
-        transcript = Path(transcript_path)
-        if not transcript.exists():
-            return False
+#     try:
+#         transcript = Path(transcript_path)
+#         if not transcript.exists():
+#             return False
 
-        current_mtime = transcript.stat().st_mtime
+#         current_mtime = transcript.stat().st_mtime
 
-        state = load_state()
-        # Use transcript path as key - this is what actually tracks if work changed
-        last_mtime = state.get(transcript_path, {}).get("last_summary_mtime")
+#         state = load_state()
+#         # Use transcript path as key - this is what actually tracks if work changed
+#         last_mtime = state.get(transcript_path, {}).get("last_summary_mtime")
 
-        if last_mtime is not None and current_mtime == last_mtime:
-            log(f"Skipping duplicate summary - transcript unchanged (mtime={current_mtime})")
-            return True
+#         if last_mtime is not None and current_mtime == last_mtime:
+#             log(f"Skipping duplicate summary - transcript unchanged (mtime={current_mtime})")
+#             return True
 
-        # Update state with current mtime
-        state[transcript_path] = {"last_summary_mtime": current_mtime}
-        save_state(state)
+#         # Update state with current mtime
+#         state[transcript_path] = {"last_summary_mtime": current_mtime}
+#         save_state(state)
 
-        return False
+#         return False
 
-    except Exception as e:
-        log(f"Error checking transcript mtime: {e}")
-        return False
+#     except Exception as e:
+#         log(f"Error checking transcript mtime: {e}")
+#         return False
 
 
 def send_event(teleclaude_session_id: str, event_type: str, data: dict) -> None:
@@ -180,7 +178,7 @@ def handle_stop(teleclaude_session_id: str, transcript_path: str, original_data:
     We send ONE stop event with all data, not separate stop + summary events.
     """
     # Run summarizer first (if applicable) - check mtime to deduplicate
-    if transcript_path and not should_skip_summary(transcript_path):
+    if transcript_path:  # and not should_skip_summary(transcript_path):
         summary_result = run_summarizer(transcript_path)
         if "error" in summary_result:
             log(f"Summarizer failed: {summary_result['error']}")
