@@ -1,8 +1,8 @@
 ---
 argument-hint: '[subject]'
 description: Find out what to do next and continue WIP or break down todo story into
-  requirements + implementation plan. Use for queries like \"what's next\", \"next-work\",
-  \"next\", \"work\", or \"start work\".
+  requirements + implementation plan. Use for queries like "what's next", "next-work",
+  "next", "work", or "start work".
 ---
 
 You are now in **WORK mode**. Your output is ALWAYS working code that is covered by tests.
@@ -43,6 +43,11 @@ ARGUMENT GIVEN: "$ARGUMENTS"
 2. **If worktree exists**:
 
    - Switch to existing worktree directory: `cd worktrees/{subject-slug}`
+   - **Sync with main** (critical to avoid stale branches):
+     - `git fetch origin`
+     - `git merge origin/main`
+     - If conflicts occur: resolve them before continuing, or ask user for guidance
+     - If merge brought changes: run `make install` to update dependencies
    - Continue with existing work
 
 3. **If worktree does NOT exist**:
@@ -113,13 +118,12 @@ If neither requirements nor a clear roadmap item exist (or info is unclear), run
    - Make code changes
    - **Delegate to `debugger` subagent**: Run tests and fix issues
    - Update checkbox from `- [ ]` to `- [x]` in `todos/{subject-slug}/implementation-plan.md`
-   - Commit ONCE with both code changes AND todo update: `/commit-commands:commit`
+   - Commit with both code changes AND todo update: `git add -A && git commit -m "type(scope): description"`
 
    **IMPORTANT**:
 
-   - Use `/commit-commands:commit` while in worktree
    - Each commit = one completed task (code + todo checkbox)
-   - Only use `/deploy` after merging to main branch
+   - Only push after merging to main branch
 
 ### Parallel Execution Example
 
@@ -148,49 +152,45 @@ If neither requirements nor a clear roadmap item exist (or info is unclear), run
 3. Confirm all requirements are addressed in the implementation
 4. Report any missing requirements
 
-### 7.2 Run Specialized Code Review
+### 7.2 Run Code Review
 
-Delegate to pr-review-toolkit: `/pr-review-toolkit:review-pr all`
+1. **Mark checkbox in-progress**: Update `- [ ] Review created` → `- [>]` in `todos/{subject-slug}/implementation-plan.md`
+2. **Run review**: `/next-review`
+3. Review outputs findings to `todos/{subject-slug}/review-findings.md`
 
-This spawns specialized agents that auto-select based on changes:
+### 7.3 Process Review Findings
 
-- **code-reviewer**: Quality, bugs, CLAUDE.md compliance
-- **pr-test-analyzer**: Test coverage, behavioral testing
-- **silent-failure-hunter**: Error handling analysis
-- **type-design-analyzer**: Type quality assessment
-- **comment-analyzer**: Documentation accuracy
-
-### 7.3 Capture Review Findings
-
-1. Wait for all agents to complete
-2. Aggregate agent reports into `todos/{subject-slug}/review-findings.md`
-3. Parse findings to identify:
+1. Parse `todos/{subject-slug}/review-findings.md` to identify:
    - Critical issues (must fix)
-   - Auto-fixable issues
-   - Manual attention needed
+   - Important issues (should fix)
+   - Suggestions (nice to have)
+2. **Mark checkbox complete**: Update `- [>] Review created` → `- [x]` in `todos/{subject-slug}/implementation-plan.md`
+3. **Commit**: `git add -A && git commit -m "docs: capture review findings"`
 
 ### 7.4 Auto-Fix Issues
 
+1. **Mark checkbox in-progress**: Update `- [ ] Review feedback handled` → `- [>]` in `todos/{subject-slug}/implementation-plan.md`
+
 **For each auto-fixable issue**:
 
-1. Apply fix using appropriate tools (Edit/Write)
-2. Run linter and tests: `make lint && make test` (or `(pnpm|npm run|bun) test`)
-3. If tests pass: continue to next fix
-4. If tests fail: debug and retry
+2. Apply fix using appropriate tools (Edit/Write)
+3. Run linter and tests: `make lint && make test` (or `(pnpm|npm run|bun) test`)
+4. If tests pass: continue to next fix
+5. If tests fail: debug and retry
 
 **After all fixes applied**:
 
-1. Commit all fixes in one commit: `/commit-commands:commit` with message "fix: address review findings"
-2. Update checkbox in `implementation-plan.md`: "Review feedback handled"
+6. **Mark checkbox complete**: Update `- [>] Review feedback handled` → `- [x]` in `todos/{subject-slug}/implementation-plan.md`
+7. **Commit**: `git add -A && git commit -m "fix: address review findings"`
 
 ### 7.5 Quality Gate
 
 **Before proceeding to merge**:
 
-- ✅ All requirements addressed
-- ✅ All critical issues resolved
-- ✅ All tests passing
-- ✅ "Review feedback handled" checked in implementation-plan.md
+- All requirements addressed
+- All critical issues resolved
+- All tests passing
+- "Review feedback handled" checked in implementation-plan.md
 
 **If critical issues remain unresolved**:
 
@@ -203,36 +203,51 @@ This spawns specialized agents that auto-select based on changes:
 
 ## Step 8: Merge Worktree and Deploy
 
-**After all tasks complete and review feedback handled**:
+**Execute Group 6 checkboxes with full checkbox discipline.**
 
-1. **Ensure all changes committed in worktree**:
+### 8.1 Pre-Merge (in worktree)
 
-   - Verify `git status` is clean
-   - All tasks should be committed (you've been doing `/commit-commands:commit` per task)
+1. **Mark checkbox in-progress**: `- [ ] Tests pass locally` → `- [>]`
+2. Run final tests: `make test` (or equivalent)
+3. **Mark checkbox complete**: `- [>]` → `- [x]`
 
-2. **Switch back to main branch**:
+4. **Mark checkbox in-progress**: `- [ ] All Groups 1-5 complete` → `- [>]`
+5. Verify all prior group checkboxes are `[x]`
+6. **Mark checkbox complete**: `- [>]` → `- [x]`
 
-   - `cd` to project root (outside worktree): `cd ../..`
-   - `git checkout main`
+7. **Commit pre-merge checkboxes**: `git add -A && git commit -m "docs: mark pre-merge tasks complete"`
 
-3. **Merge worktree branch to main**:
+### 8.2 Merge to Main
 
-   - `git merge {subject-slug}`
-   - Resolve any conflicts if needed
+1. Switch to project root: `cd ../..`
+2. Checkout main: `git checkout main`
+3. Merge: `git merge {subject-slug}`
+4. Push: `git push origin main`
 
-4. **Push to git**:
+### 8.3 Post-Merge (on main)
 
-   - git push origin main
-   - No new commit needed - merge already brought all commits to main
+1. **Mark checkbox in-progress**: `- [ ] Merged to main and pushed` → `- [>]`
+2. Verify merge succeeded (check `git log`)
+3. **Mark checkbox complete**: `- [>]` → `- [x]`
+4. **Commit**: `git add -A && git commit -m "docs: mark merge complete"`
 
-5. **Remove worktree**:
+5. **Mark checkbox in-progress**: `- [ ] Deployment verified` → `- [>]`
+6. Verify deployment on all computers
+7. **Mark checkbox complete**: `- [>]` → `- [x]`
+8. **Commit**: `git add -A && git commit -m "docs: mark deployment verified"`
 
-   - Run `/remove-worktree {subject-slug}`
-   - This removes both the worktree directory and branch
+9. **Mark checkbox in-progress**: `- [ ] Worktree cleaned up` → `- [>]`
+10. Run `/remove-worktree {subject-slug}`
+11. Verify with `/list-worktrees`
+12. **Mark checkbox complete**: `- [>]` → `- [x]`
+13. **Commit**: `git add -A && git commit -m "docs: mark worktree cleanup complete"`
 
-6. **Verify cleanup**:
-   - Run `/list-worktrees` to confirm worktree removed
-   - Check main branch has all changes
+14. **Mark checkbox in-progress**: `- [ ] Roadmap item marked complete` → `- [>]`
+15. Update `todos/roadmap.md`: Change `- [>]` → `- [x]` for this item
+16. **Mark checkbox complete**: `- [>]` → `- [x]`
+17. **Commit**: `git add -A && git commit -m "docs: mark roadmap item complete"`
+
+18. **Push final changes**: `git push origin main`
 
 ## Important Notes
 
@@ -240,8 +255,8 @@ This spawns specialized agents that auto-select based on changes:
 - **Parallel execution**: When possible, execute independent tasks simultaneously
 - **Testing is mandatory**: All code changes must have passing tests
 - **Commit per task**: One commit = code changes + checkbox update (NOT two separate commits)
-- **Use /commit in worktree**: Create local commits with `/commit-commands:commit` (no deployment yet)
-- **Use /deploy after merge**: Only push and deploy after merging to main
+- **Commit in worktree**: Create local commits while in worktree (no push yet)
+- **Push after merge**: Only push after merging to main
 - **Check dependencies**: Always verify `**DEPENDS:**` requirements are met
 - **Update roadmap**: Mark items in-progress (`[>]`) and complete (`[x]`)
 - **Ask questions**: If requirements unclear, ask before implementing
@@ -250,29 +265,43 @@ This spawns specialized agents that auto-select based on changes:
 
 For each work session:
 
-1. ✅ Check bugs first
-2. 🌳 Create/switch to worktree
-3. 📖 Read requirements.md
-4. 📋 Read implementation-plan.md
-5. 🎯 Identify current task group
-6. ⚡ Execute parallel tasks simultaneously
+1. Check bugs first
+2. Create/switch to worktree
+3. Read requirements.md
+4. Read implementation-plan.md
+5. Identify current task group
+6. Execute parallel tasks simultaneously
 
 **Per task completion**:
 
-7. 🧪 Run linter and tests
-8. ✔️ Update checkbox in implementation-plan.md
-9. 💾 `/commit-commands:commit` (one commit with code + checkbox)
+7. Run linter and tests
+8. Update checkbox in implementation-plan.md
+9. Commit (one commit with code + checkbox)
 
-**After all implementation tasks**:
+**After all implementation tasks (Group 5: Review)**:
 
-10. 📋 Verify requirements alignment (Step 7.1)
-11. 🔍 Code review: `/pr-review-toolkit:review-pr all` (Step 7.2)
-12. 📝 Aggregate findings to review-findings.md (Step 7.3) 
-13. 🔧 Auto-fix all issues (Step 7.4)
-14. 14. ✅ Quality gate check (Step 7.5)
-15. 🔀 Merge to main: `cd ../.. && git checkout main && git merge {subject-slug}`
-16. 🚀 Push to git
-17. 🧹 Cleanup: `/remove_worktree {subject-slug}`
+10. Verify requirements alignment (Step 7.1)
+11. Mark "Review created" in-progress → run `/next-review` → complete + commit
+12. Mark "Review feedback handled" in-progress → fix issues → complete + commit
+13. Quality gate check (Step 7.5)
+
+**Group 6: Pre-merge (in worktree)**:
+
+14. Mark "Tests pass locally" in-progress → test → complete
+15. Mark "All Groups 1-5 complete" in-progress → verify → complete
+16. Commit pre-merge checkboxes
+
+**Group 6: Merge**:
+
+17. Switch to main, merge, push
+
+**Group 6: Post-merge (on main)**:
+
+18. Mark "Merged to main" complete + commit
+19. Mark "Deployment verified" in-progress → verify → complete + commit
+20. Mark "Worktree cleaned up" in-progress → cleanup → complete + commit
+21. Mark "Roadmap item complete" in-progress → update roadmap → complete + commit
+22. Push final changes
 
 ## Error Handling
 

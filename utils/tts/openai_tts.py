@@ -3,8 +3,13 @@
 import asyncio
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Load .env from ~/.claude/ since scripts may run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
+
 from openai import AsyncOpenAI
 from openai.helpers import LocalAudioPlayer
 
@@ -70,5 +75,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    load_dotenv()
     asyncio.run(main())

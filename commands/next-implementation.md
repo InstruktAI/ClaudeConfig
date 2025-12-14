@@ -5,6 +5,22 @@ description: Create implementation plan from requirements with parallel task sup
 
 You are now in **implementation planning mode**. Follow these steps to create an actionable implementation plan:
 
+## Step 0: Verify Prerequisites
+
+**Before proceeding, check:**
+
+1. **Open bugs?** Read `todos/bugs.md` for unchecked items (`- [ ]`)
+   - If bugs exist: "⚠️ Open bugs found. Fix bugs first via `/next-work` or acknowledge to continue."
+   - Wait for user confirmation before proceeding
+
+2. **In a worktree?** Check if current directory is under `worktrees/`
+   - If NOT in worktree: "⚠️ Not in a worktree. Run `/next-work` to create one, or `/create-worktree {subject-slug}` first."
+   - Wait for user confirmation before proceeding
+
+3. **Called from /next-work?** If user jumped directly here, remind them:
+   - "💡 For the full workflow (bugs → worktree → requirements → implementation → review → merge), run `/next-work` instead."
+   - Continue if user confirms they want implementation planning only
+
 ## Step 1: Determine Subject
 
 SUBJECT GIVEN: "$ARGUMENTS"
@@ -84,21 +100,26 @@ _These tasks can run in parallel_
 
 ### Group 5: Review & Finalize
 
-_These tasks must run sequentially_
+_These tasks must run sequentially. Each follows checkbox discipline: mark in-progress → do work → mark complete → commit._
 
-- [ ] Review created (automated via `/review {subject-slug}`)
-- [ ] Review feedback handled (automated by spawned agent)
+- [ ] **SEQUENTIAL** Review created → produces `review-findings.md`
+- [ ] **SEQUENTIAL** Review feedback handled → fixes applied from findings
 
-### Group 6: Deployment
+### Group 6: Merge & Deploy
 
-_These tasks must run sequentially_
+_These tasks must run sequentially. Each follows checkbox discipline: mark in-progress → do work → mark complete → commit._
 
-- [ ] Test locally with `make restart && make status`
-- [ ] Switch to main: `cd ../.. && git checkout main`
-- [ ] Merge worktree branch: `git merge {subject-slug}`
-- [ ] Push to git
-- [ ] Verify deployment on all computers
-- [ ] Cleanup worktree: `/remove_worktree {subject-slug}`
+**Pre-merge (in worktree, commit before merge):**
+
+- [ ] **SEQUENTIAL** Tests pass locally (`make test` or equivalent)
+- [ ] **SEQUENTIAL** All Groups 1-5 complete (ready to merge)
+
+**Post-merge (on main, commit after each):**
+
+- [ ] **SEQUENTIAL** Merged to main and pushed
+- [ ] **SEQUENTIAL** Deployment verified on all computers
+- [ ] **SEQUENTIAL** Worktree cleaned up
+- [ ] **SEQUENTIAL** Roadmap item marked complete (`[x]` in `todos/roadmap.md`)
 
 ## Task Markers
 
@@ -140,9 +161,7 @@ Before marking complete, verify all requirements success criteria:
 
 ## Completion
 
-- [ ] All task groups completed
-- [ ] Success criteria verified
-- [ ] Mark roadmap item as complete (`[x]`)
+When all Group 6 checkboxes are complete, this item is done. The roadmap update is the final checkbox in Group 6.
 
 ---
 

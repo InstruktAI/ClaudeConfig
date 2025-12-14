@@ -7,13 +7,15 @@ Priority order: ElevenLabs > OpenAI > pyttsx3
 import os
 import subprocess
 import time
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
 
 from utils.logging_helper import log
 
-load_dotenv()
+# Load .env from ~/.claude/ since hooks run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
 
 
 def get_tts_script_path() -> Optional[str]:

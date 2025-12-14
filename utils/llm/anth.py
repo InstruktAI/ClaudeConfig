@@ -2,8 +2,12 @@
 
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Load .env from ~/.claude/ since scripts may run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
 
 
 def prompt_llm(prompt_text):
@@ -16,7 +20,6 @@ def prompt_llm(prompt_text):
     Returns:
         str: The model's response text, or None if error
     """
-    load_dotenv()
 
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:

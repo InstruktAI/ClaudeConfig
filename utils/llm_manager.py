@@ -7,13 +7,15 @@ Priority order: OpenAI > Anthropic
 import os
 import random
 import subprocess
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
 
 from utils.logging_helper import log
 
-load_dotenv()
+# Load .env from ~/.claude/ since hooks run from project directories
+load_dotenv(Path.home() / ".claude" / ".env")
 
 
 def prompt(text: str, hook_name: str = "llm_manager") -> Optional[str]:
