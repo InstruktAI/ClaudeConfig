@@ -15,12 +15,6 @@
         "FIRECRAWL_API_KEY": "{FIRECRAWL_API_KEY}"
       }
     },
-    "gmail": {
-      "command": "npx",
-      "args": [
-        "@shinzolabs/gmail-mcp"
-      ]
-    },
     "limitless": {
       "command": "npx",
       "args": [

@@ -23,13 +23,16 @@ Provide overview of all worktrees, focusing on those in the standardized `trees/
 ### 2. Categorize Worktrees
 
 **Main repository:**
+
 - Identify the main worktree (not in trees/)
 
 **Trees worktrees:**
+
 - Filter worktrees in `trees/` directory
 - Sort alphabetically by branch name
 
 **Other worktrees:**
+
 - Any worktrees not in main or trees/
 
 ### 3. Get Current Branch
@@ -39,7 +42,7 @@ Provide overview of all worktrees, focusing on those in the standardized `trees/
 
 ### 4. Report
 
-```
+```text
 📊 Git Worktrees
 
 ═══════════════════════════════════════════════
@@ -69,7 +72,8 @@ Provide overview of all worktrees, focusing on those in the standardized `trees/
 ```
 
 If no worktrees in trees/:
-```
+
+```text
 📊 Git Worktrees
 
 🏠 Main Repository
@@ -83,7 +87,8 @@ If no worktrees in trees/:
 ```
 
 If there are worktrees outside trees/:
-```
+
+```text
 ⚠️  Other Worktrees (not in trees/):
    • <path> (<branch>)
 ```

@@ -55,7 +55,7 @@ Clean up worktrees with validation and optional branch deletion.
 
 ### 7. Report
 
-```
+```text
 ✅ Worktree Removed
 
 📁 Location: trees/$BRANCH_NAME (deleted)

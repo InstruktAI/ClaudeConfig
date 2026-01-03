@@ -16,10 +16,15 @@
           {
             "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type Notification --summarize "
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "/Users/morriz/Workspace/InstruktAI/TeleClaude/.venv/bin/python /Users/morriz/Workspace/InstruktAI/TeleClaude/teleclaude/hooks/receiver.py --agent claude notification"
           }
         ]
       }
@@ -34,10 +39,15 @@
           {
             "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type SessionStart"
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "/Users/morriz/Workspace/InstruktAI/TeleClaude/.venv/bin/python /Users/morriz/Workspace/InstruktAI/TeleClaude/teleclaude/hooks/receiver.py --agent claude session_start"
           }
         ]
       }
@@ -70,10 +80,15 @@
           {
             "type": "command",
             "command": "$HOME/.claude/hooks/stop.sh"
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/teleclaude_bridge.py"
+            "command": "/Users/morriz/Workspace/InstruktAI/TeleClaude/.venv/bin/python /Users/morriz/Workspace/InstruktAI/TeleClaude/teleclaude/hooks/receiver.py --agent claude stop"
           }
         ]
       }
@@ -97,10 +112,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/user_prompt_submit.sh"
-          },
-          {
-            "type": "command",
             "command": "$HOME/.claude/.venv/bin/python $HOME/.claude/hooks/send_event.py --source-app teleclaude --event-type UserPromptSubmit --summarize"
           }
         ]
@@ -113,20 +124,23 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "agent-sdk-dev@claude-code-plugins": true,
-    "pr-review-toolkit@claude-code-plugins": true,
-    "commit-commands@claude-code-plugins": true,
-    "feature-dev@claude-code-plugins": true,
-    "security-guidance@claude-code-plugins": true,
-    "code-review@claude-code-plugins": true,
-    "explanatory-output-style@claude-code-plugins": true,
-    "learning-output-style@claude-code-plugins": true,
-    "frontend-design@claude-code-plugins": true,
-    "hookify@claude-code-plugins": true,
-    "plugin-dev@claude-code-plugins": true
+    "agent-sdk-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ralph-wiggum@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754048693214
-  }
+  },
+  "model": "opus"
 }

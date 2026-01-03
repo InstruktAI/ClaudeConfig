@@ -8,6 +8,7 @@ __pycache__/
 
 # Testing
 .pytest_cache/
+.mypy_cache/
 .coverage
 htmlcov/
 
@@ -38,6 +39,7 @@ session-env/
 shell-snapshots/
 statsig/
 history.jsonl
+stats-cache.json
 version_check_cache
 
 # Temporary files

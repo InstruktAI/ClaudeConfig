@@ -1,6 +1,7 @@
 # Runtime dependencies
-python-dotenv>=1.0.0
 anthropic>=0.40.0
-openai>=1.58.1
 elevenlabs>=1.11.1
+hookify==1.1.4
+openai>=1.58.1
+python-dotenv>=1.0.0
 pyttsx3>=2.98

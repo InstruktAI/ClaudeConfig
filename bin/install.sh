@@ -100,25 +100,6 @@ set -a
 source .env
 set +a
 
-# Create id.md from template if needed
-if [ ! -f id.md ]; then
-  if [ -z "$ENGINEER_NAME" ] || [ -z "$ENGINEER_EMAIL" ]; then
-    echo "⚠️  Cannot create id.md: ENGINEER_NAME or ENGINEER_EMAIL not set"
-    echo "   Edit .env and run 'make install' again"
-    echo ""
-  else
-    echo "→ Creating id.md..."
-    sed -e "s/{ENGINEER_NAME}/$ENGINEER_NAME/g" \
-        -e "s|{ENGINEER_EMAIL}|$ENGINEER_EMAIL|g" \
-        id.md.example > id.md
-    echo "  ✓ id.md created"
-    echo ""
-  fi
-else
-  echo "→ id.md already exists (preserved)"
-  echo ""
-fi
-
 # Create voices.json from template if needed
 if [ ! -f voices.json ]; then
   echo "→ Creating voices.json from template..."

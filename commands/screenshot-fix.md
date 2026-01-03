@@ -13,9 +13,9 @@ This command helps fix UI issues by analyzing a screenshot provided by the user 
 - If a screenshot path is provided in arguments, use that file
 - If no path is provided, execute `ls -t /Users/Morriz/Library/CloudStorage/Dropbox/Screenshots | head -n 1` to use the most recent one.
 
-2. **Read Screenshot**: Use the Read tool to view the specified or latest screenshot file
-3. **Analyze Issues**: Identify UI problems, layout issues, styling problems, or functional bugs visible in the screenshot
-4. **Fix Issues**:
+1. **Read Screenshot**: Use the Read tool to view the specified or latest screenshot file
+2. **Analyze Issues**: Identify UI problems, layout issues, styling problems, or functional bugs visible in the screenshot
+3. **Fix Issues**:
    - Make the necessary code changes to fix identified issues
    - Modify relevant component files directly
    - Apply CSS/styling fixes

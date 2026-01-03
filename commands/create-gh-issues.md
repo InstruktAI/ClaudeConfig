@@ -11,20 +11,23 @@ The objective is to ONLY WORK ON GIHUB ISSUES created from the implementation pl
 
 ## 🚨 CRITICAL RULES (ADHERE AT ALL COSTS!)
 
-🚨 **ONLY USE EXISTING GITHUB LABELS** 🚨
+### Only Use Existing GitHub Labels
+
 - GitHub repos have standard labels already (bug, enhancement, documentation, etc.)
 - **NEVER create new labels** - label sprawl is a signalling problem
 - Use existing labels sparingly as signals, not information reference
 - Common existing labels: `bug`, `enhancement`, `documentation`, `question`, `help wanted`
 
-🚨 **DO NOT CREATE ISSUES FOR LOCAL SETUP TASKS** 🚨
+### Do Not Create Issues For Local Setup Tasks
+
 - **NEVER create issues for installing dependencies** (SOPS, age, npm, python packages, etc.)
 - **NEVER create issues for local environment setup** (generating keys, configuring local machine)
-- **NEVER create issues that require sudo/system access**
+- **NEVER:** create issues that require sudo/system access
 - These tasks MUST be done locally by the user, not in CI/GitHub Actions
 - Only create issues for **code changes** that can be automated in CI
 
-🚨 **FOCUS ON AUTOMATABLE TASKS** 🚨
+### Focus On Automatable Tasks
+
 - ✅ Creating files, writing code, updating documentation
 - ✅ Running tests, validation, linting
 - ✅ Refactoring, migration scripts
@@ -108,7 +111,8 @@ Once the user approves the plan, create GitHub issues using the GitHub MCP tools
 For each issue:
 
 1. **Create the issue** with:
-   ```
+
+   ```text
    Title: <Clear, actionable title>
 
    Body:
@@ -176,7 +180,8 @@ For each issue:
 3. **Set dependencies** (in issue body, as GitHub doesn't have native dependency fields)
 
 4. **Report progress** to user:
-   ```
+
+   ```text
    Created issue #123: Setup SOPS Infrastructure
    Created issue #124: Create samples/ Directory
    ...
@@ -196,7 +201,7 @@ For each issue:
 
 ## Example Dependency Graph
 
-```
+```text
 #1 (SOPS) ─┬─> #3 (Repos) ──> #4 (Secrets Submodule) ──> #5 (Extract Secrets)
            │                                            └──> #8 (Migration Script)
            └─> #6 (itsup init) ──> #11 (CLI)

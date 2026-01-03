@@ -48,7 +48,7 @@ BRANCH_NAME: "$ARGUMENTS"
 
 ### 6. Report
 
-```
+```text
 ✅ Worktree Created
 
 📁 Location: trees/$BRANCH_NAME
@@ -66,7 +66,7 @@ BRANCH_NAME: "$ARGUMENTS"
 
 If branch was newly created:
 
-```
+```text
 ℹ️  New branch created from current HEAD
 ```
 

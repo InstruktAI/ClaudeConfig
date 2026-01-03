@@ -12,7 +12,8 @@ Autonomous sync of todos against architecture and codebase. Detects AND fixes dr
 ### Phase 1: Parallel Scanning (launch all 3 simultaneously)
 
 **Agent 1: Architecture Scanner** (`subagent_type=Explore`)
-```
+
+```text
 Discover and read architecture docs in docs/ folder.
 Look for: architecture.md, use-cases.md, design docs, domain logic docs.
 
@@ -25,7 +26,8 @@ Return JSON:
 ```
 
 **Agent 2: Codebase Scanner** (`subagent_type=Explore`)
-```
+
+```text
 Scan source directories for implemented features.
 Identify main modules and what they implement.
 
@@ -37,7 +39,8 @@ Return JSON:
 ```
 
 **Agent 3: Todos Scanner** (`subagent_type=Explore`)
-```
+
+```text
 Read todos/roadmap.md
 
 Return JSON:
@@ -52,22 +55,26 @@ Return JSON:
 
 After agents return, identify issues AND fix them:
 
-| Issue | Action |
-|-------|--------|
+| Issue | Action (do in this order) |
+| ----- | -------------------------- |
 | Todo marked complete but code missing | Mark as pending in roadmap.md |
 | Code exists but todo marked pending | Mark as complete in roadmap.md |
 | Folder exists but not in roadmap | Add to roadmap or delete folder |
-| Todo obsolete (not in architecture) | Remove from roadmap |
+| Completed todo folder ready to archive | 1) Append log line to todos/delivered.md, 2) remove the item from roadmap.md entirely (delivered items do not stay on the roadmap), 3) move `todos/{slug}/` to `done/{NNN}-{slug}/` (see below). |
+| Todo obsolete (not in architecture) | Remove from roadmap (no delivered log) |
 
-**Directly edit:**
-- `todos/roadmap.md` - fix status, add missing, remove obsolete
-- Delete stale folders (after confirmation)
+**Directly edit (be explicit):**
+
+- `todos/roadmap.md` - adjust status and remove delivered items entirely; do **not** record deliveries here.
+- `todos/delivered.md` - for every completed todo being archived, append exactly one line (pipe-delimited): `YYYY-MM-DD | {slug} | {title/description} | outcome | PR/commit | {archive_folder}`. Create the file if missing. Example: `2025-12-13 | add-login | add login flow | deployed to prod | PR #123 | done/007-add-login`.
+- Move delivered folders instead of deleting: find highest existing prefix in `done/` (three digits, zero-padded). New folder = `done/{next:03d}-{slug}/`. Move `todos/{slug}/` there after logging. If `done/` missing, create it.
+- Delete only obsolete folders (not delivered) after confirming they are not needed.
 
 ### Phase 3: Report Changes Made
 
 Output a summary of CHANGES MADE (not recommendations):
 
-```
+```text
 ## Sync Complete
 
 **Fixed:**
@@ -87,7 +94,8 @@ Output a summary of CHANGES MADE (not recommendations):
 ### Phase 4: Commit (optional)
 
 If changes were made, offer to commit:
-```
+
+```bash
 git add todos/
 git commit -m "chore(todos): sync roadmap with architecture and codebase"
 ```
